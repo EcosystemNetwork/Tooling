@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dev Tools Control Center</title>
+  <title>GameForge — Browser Game Dev Tooling</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
@@ -24,7 +24,7 @@
     <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
       <span></span><span></span><span></span>
     </button>
-    <h1 class="header-title">Dev Tools Control Center</h1>
+    <h1 class="header-title">GameForge — Browser Game Dev Tooling</h1>
     <div class="header-controls">
       <button class="header-btn" onclick="exportAllData()" title="Export Data">💾 Export</button>
       <button class="header-btn" onclick="importData()" title="Import Data">📥 Import</button>
@@ -38,13 +38,18 @@
 
   <!-- Sidebar Navigation -->
   <nav class="sidebar" id="sidebar">
-    <div class="sidebar-logo">DTCC</div>
+    <div class="sidebar-logo">🎮 GameForge</div>
     <ul class="sidebar-nav">
       <li><a href="#dashboard" class="nav-link active" data-section="dashboard"><span class="nav-icon">📊</span> Dashboard</a></li>
+      <li><a href="#scenes" class="nav-link" data-section="scenes"><span class="nav-icon">🌐</span> Scene Manager</a></li>
+      <li><a href="#shaders" class="nav-link" data-section="shaders"><span class="nav-icon">✨</span> Shader Library</a></li>
+      <li><a href="#snippets" class="nav-link" data-section="snippets"><span class="nav-icon">📝</span> Code Snippets</a></li>
       <li><a href="#assets" class="nav-link" data-section="assets"><span class="nav-icon">🎨</span> Assets</a></li>
+      <li><a href="#performance" class="nav-link" data-section="performance"><span class="nav-icon">⚡</span> Performance</a></li>
       <li><a href="#builds" class="nav-link" data-section="builds"><span class="nav-icon">🚀</span> Builds</a></li>
       <li><a href="#team" class="nav-link" data-section="team"><span class="nav-icon">👥</span> Team</a></li>
       <li><a href="#events" class="nav-link" data-section="events"><span class="nav-icon">📅</span> Events</a></li>
+      <li><a href="#docs" class="nav-link" data-section="docs"><span class="nav-icon">📚</span> Docs &amp; Resources</a></li>
       <li><a href="#analytics" class="nav-link" data-section="analytics"><span class="nav-icon">📈</span> Analytics</a></li>
     </ul>
   </nav>
@@ -64,7 +69,58 @@
       <div class="project-grid" id="projectGrid"></div>
     </section>
 
-    <!-- Section 2: Asset Manager -->
+    <!-- Section: Scene Manager -->
+    <section id="scenes" class="section">
+      <div class="section-header">
+        <h2 class="section-title">Scene Manager</h2>
+        <button class="add-btn" onclick="addNewScene()">+ Add Scene</button>
+      </div>
+      <div class="engine-toggle">
+        <button class="engine-btn active" data-engine="all">All Engines</button>
+        <button class="engine-btn" data-engine="threejs">Three.js</button>
+        <button class="engine-btn" data-engine="babylonjs">Babylon.js</button>
+      </div>
+      <div class="scene-grid" id="sceneGrid"></div>
+    </section>
+
+    <!-- Section: Shader Library -->
+    <section id="shaders" class="section">
+      <div class="section-header">
+        <h2 class="section-title">Shader Library</h2>
+        <button class="add-btn" onclick="addNewShader()">+ Add Shader</button>
+      </div>
+      <div class="shader-filters">
+        <button class="tag-btn active" data-shader-type="All">All</button>
+        <button class="tag-btn" data-shader-type="Vertex">Vertex</button>
+        <button class="tag-btn" data-shader-type="Fragment">Fragment</button>
+        <button class="tag-btn" data-shader-type="Post-Process">Post-Process</button>
+        <button class="tag-btn" data-shader-type="Compute">Compute</button>
+      </div>
+      <div class="shader-grid" id="shaderGrid"></div>
+    </section>
+
+    <!-- Section: Code Snippets -->
+    <section id="snippets" class="section">
+      <div class="section-header">
+        <h2 class="section-title">Code Snippets Library</h2>
+        <button class="add-btn" onclick="addNewSnippet()">+ Add Snippet</button>
+      </div>
+      <div class="snippet-controls">
+        <div class="search-wrapper">
+          <input type="text" id="snippetSearch" class="search-input" placeholder="Search snippets...">
+        </div>
+        <div class="snippet-filters" id="snippetFilters">
+          <button class="tag-btn active" data-snippet-engine="All">All</button>
+          <button class="tag-btn" data-snippet-engine="Three.js">Three.js</button>
+          <button class="tag-btn" data-snippet-engine="Babylon.js">Babylon.js</button>
+          <button class="tag-btn" data-snippet-engine="GLSL">GLSL</button>
+          <button class="tag-btn" data-snippet-engine="WebGPU">WebGPU</button>
+        </div>
+      </div>
+      <div class="snippet-grid" id="snippetGrid"></div>
+    </section>
+
+    <!-- Section: Asset Manager -->
     <section id="assets" class="section">
       <div class="section-header">
         <h2 class="section-title">Asset Manager Library</h2>
@@ -77,6 +133,16 @@
         <div class="tag-filters" id="tagFilters"></div>
       </div>
       <div class="asset-grid" id="assetGrid"></div>
+    </section>
+
+    <!-- Section: Performance Monitor -->
+    <section id="performance" class="section">
+      <div class="section-header">
+        <h2 class="section-title">Performance Monitor</h2>
+        <button class="add-btn" onclick="addNewPerfMetric()">+ Add Metric</button>
+      </div>
+      <div class="perf-overview" id="perfOverview"></div>
+      <div class="perf-grid" id="perfGrid"></div>
     </section>
 
     <!-- Section 3: Build & Deploy Pipeline -->
@@ -126,13 +192,105 @@
       </div>
     </section>
 
-    <!-- Section 5: Live Ops / Events -->
+    <!-- Section: Live Ops / Events -->
     <section id="events" class="section">
       <div class="section-header">
         <h2 class="section-title">Live Ops / Events Schedule</h2>
         <button class="add-btn" onclick="addNewEvent()">+ Add Event</button>
       </div>
       <div class="events-grid" id="eventsGrid"></div>
+    </section>
+
+    <!-- Section: Docs & Resources -->
+    <section id="docs" class="section">
+      <div class="section-header">
+        <h2 class="section-title">Documentation &amp; Resources</h2>
+      </div>
+      <div class="docs-grid">
+        <div class="card docs-card">
+          <div class="docs-engine-header">
+            <span class="docs-engine-icon">🔺</span>
+            <h3 class="docs-engine-name">Three.js</h3>
+            <span class="badge badge-active">r169</span>
+          </div>
+          <p class="docs-desc">Lightweight cross-browser 3D library using WebGL/WebGPU. Perfect for creative web experiences and browser games.</p>
+          <div class="docs-links">
+            <a href="https://threejs.org/docs/" target="_blank" rel="noopener noreferrer" class="docs-link">📖 Official Docs</a>
+            <a href="https://threejs.org/examples/" target="_blank" rel="noopener noreferrer" class="docs-link">🎮 Examples</a>
+            <a href="https://github.com/mrdoob/three.js" target="_blank" rel="noopener noreferrer" class="docs-link">💻 GitHub</a>
+            <a href="https://threejs.org/editor/" target="_blank" rel="noopener noreferrer" class="docs-link">🛠️ Editor</a>
+            <a href="https://discourse.threejs.org/" target="_blank" rel="noopener noreferrer" class="docs-link">💬 Forum</a>
+          </div>
+          <div class="docs-topics">
+            <span class="docs-topic-tag">WebGLRenderer</span>
+            <span class="docs-topic-tag">Scene</span>
+            <span class="docs-topic-tag">PerspectiveCamera</span>
+            <span class="docs-topic-tag">Mesh</span>
+            <span class="docs-topic-tag">ShaderMaterial</span>
+            <span class="docs-topic-tag">Raycaster</span>
+            <span class="docs-topic-tag">OrbitControls</span>
+            <span class="docs-topic-tag">GLTFLoader</span>
+            <span class="docs-topic-tag">EffectComposer</span>
+          </div>
+        </div>
+        <div class="card docs-card">
+          <div class="docs-engine-header">
+            <span class="docs-engine-icon">🏛️</span>
+            <h3 class="docs-engine-name">Babylon.js</h3>
+            <span class="badge badge-beta">7.x</span>
+          </div>
+          <p class="docs-desc">Powerful, beautiful, and full-featured 3D engine. Built-in physics, GUI, animation, and game framework support.</p>
+          <div class="docs-links">
+            <a href="https://doc.babylonjs.com/" target="_blank" rel="noopener noreferrer" class="docs-link">📖 Official Docs</a>
+            <a href="https://playground.babylonjs.com/" target="_blank" rel="noopener noreferrer" class="docs-link">🎮 Playground</a>
+            <a href="https://github.com/BabylonJS/Babylon.js" target="_blank" rel="noopener noreferrer" class="docs-link">💻 GitHub</a>
+            <a href="https://sandbox.babylonjs.com/" target="_blank" rel="noopener noreferrer" class="docs-link">🛠️ Sandbox</a>
+            <a href="https://forum.babylonjs.com/" target="_blank" rel="noopener noreferrer" class="docs-link">💬 Forum</a>
+          </div>
+          <div class="docs-topics">
+            <span class="docs-topic-tag">Engine</span>
+            <span class="docs-topic-tag">Scene</span>
+            <span class="docs-topic-tag">ArcRotateCamera</span>
+            <span class="docs-topic-tag">HemisphericLight</span>
+            <span class="docs-topic-tag">NodeMaterial</span>
+            <span class="docs-topic-tag">PhysicsAggregate</span>
+            <span class="docs-topic-tag">GUI</span>
+            <span class="docs-topic-tag">SceneLoader</span>
+            <span class="docs-topic-tag">Animations</span>
+          </div>
+        </div>
+        <div class="card docs-card">
+          <div class="docs-engine-header">
+            <span class="docs-engine-icon">🔧</span>
+            <h3 class="docs-engine-name">Essential Tools</h3>
+          </div>
+          <p class="docs-desc">Companion libraries, physics engines, and utilities for browser-based game development.</p>
+          <div class="docs-links">
+            <a href="https://cannon-es.pmnd.rs/" target="_blank" rel="noopener noreferrer" class="docs-link">🧲 Cannon-es (Physics)</a>
+            <a href="https://rapier.rs/" target="_blank" rel="noopener noreferrer" class="docs-link">⚡ Rapier (Physics)</a>
+            <a href="https://github.com/pmndrs/react-three-fiber" target="_blank" rel="noopener noreferrer" class="docs-link">⚛️ React Three Fiber</a>
+            <a href="https://tweakpane.github.io/docs/" target="_blank" rel="noopener noreferrer" class="docs-link">🎛️ Tweakpane (Debug UI)</a>
+            <a href="https://github.com/dataarts/dat.gui" target="_blank" rel="noopener noreferrer" class="docs-link">🎚️ dat.GUI</a>
+            <a href="https://gltf.report/" target="_blank" rel="noopener noreferrer" class="docs-link">📦 glTF Report</a>
+            <a href="https://spector.babylonjs.com/" target="_blank" rel="noopener noreferrer" class="docs-link">🔍 Spector.js (WebGL Debug)</a>
+          </div>
+        </div>
+        <div class="card docs-card">
+          <div class="docs-engine-header">
+            <span class="docs-engine-icon">🎓</span>
+            <h3 class="docs-engine-name">Learning Resources</h3>
+          </div>
+          <p class="docs-desc">Tutorials, courses, and community resources for browser-based 3D game development.</p>
+          <div class="docs-links">
+            <a href="https://threejs-journey.com/" target="_blank" rel="noopener noreferrer" class="docs-link">🎓 Three.js Journey</a>
+            <a href="https://webglfundamentals.org/" target="_blank" rel="noopener noreferrer" class="docs-link">📐 WebGL Fundamentals</a>
+            <a href="https://webgpufundamentals.org/" target="_blank" rel="noopener noreferrer" class="docs-link">🔮 WebGPU Fundamentals</a>
+            <a href="https://thebookofshaders.com/" target="_blank" rel="noopener noreferrer" class="docs-link">🎨 Book of Shaders</a>
+            <a href="https://shadertoy.com/" target="_blank" rel="noopener noreferrer" class="docs-link">✨ Shadertoy</a>
+            <a href="https://discoverthreejs.com/" target="_blank" rel="noopener noreferrer" class="docs-link">🔍 Discover Three.js</a>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Section 6: Analytics & KPIs -->

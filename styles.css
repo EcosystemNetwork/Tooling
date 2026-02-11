@@ -815,6 +815,351 @@ body {
   to   { opacity: 0; transform: translateX(40px); }
 }
 
+/* ===== Engine Toggle (Scene Manager) ===== */
+.engine-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.engine-btn {
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.25s;
+}
+.engine-btn:hover { border-color: var(--green-primary); color: var(--text-primary); }
+.engine-btn.active {
+  background: linear-gradient(135deg, rgba(0, 201, 167, 0.2), rgba(30, 136, 229, 0.2));
+  border-color: var(--green-primary);
+  color: var(--green-primary);
+}
+
+/* ===== Scene Manager ===== */
+.scene-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
+}
+.scene-card .scene-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+.scene-card .scene-name {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.scene-card .scene-engine {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.scene-card .scene-stats {
+  display: flex;
+  gap: 14px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.scene-card .scene-stats span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.scene-card .scene-objects {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.scene-obj-tag {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  background: rgba(30, 136, 229, 0.12);
+  color: var(--blue-light);
+}
+.badge-threejs {
+  background: rgba(0, 201, 167, 0.15);
+  color: var(--green-primary);
+}
+.badge-babylonjs {
+  background: rgba(30, 136, 229, 0.15);
+  color: var(--blue-light);
+}
+
+/* ===== Shader Library ===== */
+.shader-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.shader-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+.shader-card .shader-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+.shader-card .shader-name {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+.shader-card .shader-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+.shader-card .shader-preview {
+  width: 100%;
+  height: 80px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+}
+.shader-card .shader-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.shader-tag {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  background: rgba(124, 77, 255, 0.12);
+  color: #b388ff;
+}
+
+/* ===== Code Snippets ===== */
+.snippet-controls {
+  margin-bottom: 20px;
+}
+.snippet-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.snippet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 18px;
+}
+.snippet-card .snippet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+.snippet-card .snippet-title {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.snippet-card .snippet-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+.snippet-card .snippet-code {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(30, 136, 229, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.75rem;
+  color: var(--green-primary);
+  overflow-x: auto;
+  white-space: pre;
+  line-height: 1.5;
+  max-height: 160px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+.snippet-card .snippet-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.snippet-copy-btn {
+  padding: 4px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 201, 167, 0.3);
+  background: rgba(0, 201, 167, 0.1);
+  color: var(--green-primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+.snippet-copy-btn:hover {
+  background: rgba(0, 201, 167, 0.2);
+  border-color: var(--green-primary);
+}
+
+/* ===== Performance Monitor ===== */
+.perf-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.perf-stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 18px;
+  text-align: center;
+}
+.perf-stat-card .perf-stat-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.perf-stat-card .perf-stat-value {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+.perf-stat-card .perf-stat-unit {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.perf-stat-good { color: var(--green-bright); }
+.perf-stat-warn { color: var(--orange); }
+.perf-stat-bad  { color: var(--red); }
+
+.perf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+.perf-card .perf-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+.perf-card .perf-category {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.perf-card .perf-bar-wrapper {
+  background: rgba(255,255,255,0.08);
+  border-radius: 6px;
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.perf-card .perf-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.6s ease;
+}
+.perf-bar-good { background: linear-gradient(90deg, var(--green-primary), var(--green-bright)); }
+.perf-bar-warn { background: linear-gradient(90deg, var(--orange), #ffd740); }
+.perf-bar-bad  { background: linear-gradient(90deg, var(--red), #ff1744); }
+.perf-card .perf-detail {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ===== Docs & Resources ===== */
+.docs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
+}
+.docs-card {
+  padding: 24px !important;
+}
+.docs-engine-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.docs-engine-icon {
+  font-size: 1.4rem;
+}
+.docs-engine-name {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+.docs-desc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.docs-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.docs-link {
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(30, 136, 229, 0.1);
+  border: 1px solid rgba(30, 136, 229, 0.2);
+  color: var(--blue-light);
+  font-size: 0.76rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.docs-link:hover {
+  background: rgba(30, 136, 229, 0.2);
+  border-color: var(--blue-light);
+  color: var(--text-primary);
+}
+.docs-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.docs-topic-tag {
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  background: rgba(0, 201, 167, 0.08);
+  color: var(--green-primary);
+  font-family: 'Courier New', Courier, monospace;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 900px) {
   .sidebar { transform: translateX(-100%); }
@@ -829,7 +1174,13 @@ body {
   .project-grid,
   .asset-grid,
   .events-grid,
-  .kpi-grid {
+  .kpi-grid,
+  .scene-grid,
+  .shader-grid,
+  .snippet-grid,
+  .perf-grid,
+  .perf-overview,
+  .docs-grid {
     grid-template-columns: 1fr;
   }
 
