@@ -20,6 +20,7 @@ A comprehensive web-based dashboard application for managing development project
 - Monitor build and deployment status
 - Track build duration and triggered by information
 - View build history with timestamps
+- Add, edit, and delete build entries
 
 ### 👥 Team Management
 - Manage team members and their roles (Admin, Developer, Artist, QA, Viewer)
@@ -37,6 +38,7 @@ A comprehensive web-based dashboard application for managing development project
 - View key performance indicators
 - Track metrics with trend indicators
 - Monitor daily active users, revenue, retention rate, and more
+- Add, edit, and delete KPI entries
 
 ### 💾 Data Management
 - **Persistent Storage**: All data is automatically saved to browser LocalStorage
@@ -79,8 +81,10 @@ Each section has an "Add" button in the top-right corner:
 
 1. **Add Project**: Click "+ Add Project" in the Dashboard section
 2. **Add Asset**: Click "+ Add Asset" in the Asset Manager section
-3. **Add Team Member**: Click "+ Add Member" in the Team section
-4. **Add Event**: Click "+ Add Event" in the Events section
+3. **Add Build**: Click "+ Add Build" in the Build Pipeline section
+4. **Add Team Member**: Click "+ Add Member" in the Team section
+5. **Add Event**: Click "+ Add Event" in the Events section
+6. **Add KPI**: Click "+ Add KPI" in the Analytics section
 
 Follow the prompts to enter the required information.
 

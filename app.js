@@ -131,6 +131,23 @@ const DataService = {
     return build;
   },
 
+  updateBuild(id, updatedData) {
+    const builds = this.getBuilds();
+    const index = builds.findIndex(b => b.id === id);
+    if (index !== -1) {
+      builds[index] = { ...builds[index], ...updatedData };
+      this.saveBuilds(builds);
+      return builds[index];
+    }
+    return null;
+  },
+
+  deleteBuild(id) {
+    const builds = this.getBuilds();
+    const filtered = builds.filter(b => b.id !== id);
+    this.saveBuilds(filtered);
+  },
+
   // Team Members
   getTeamMembers() {
     return this.load(this.KEYS.TEAM_MEMBERS);
@@ -208,6 +225,33 @@ const DataService = {
 
   saveKPIs(kpis) {
     this.save(this.KEYS.KPIS, kpis);
+  },
+
+  addKPI(kpi) {
+    const kpis = this.getKPIs();
+    const idsWithValues = kpis.filter(k => k.id).map(k => k.id);
+    const maxId = idsWithValues.length > 0 ? Math.max(...idsWithValues) : 0;
+    kpi.id = maxId + 1;
+    kpis.push(kpi);
+    this.saveKPIs(kpis);
+    return kpi;
+  },
+
+  updateKPI(id, updatedData) {
+    const kpis = this.getKPIs();
+    const index = kpis.findIndex(k => k.id === id);
+    if (index !== -1) {
+      kpis[index] = { ...kpis[index], ...updatedData };
+      this.saveKPIs(kpis);
+      return kpis[index];
+    }
+    return null;
+  },
+
+  deleteKPI(id) {
+    const kpis = this.getKPIs();
+    const filtered = kpis.filter(k => k.id !== id);
+    this.saveKPIs(filtered);
   },
 
   // Export all data
@@ -304,12 +348,12 @@ const DataService = {
 
   getDefaultKPIs() {
     return [
-      { label: "Daily Active Users", value: "128,430", trend: "up", change: "+12.4%" },
-      { label: "Revenue (MTD)", value: "$1.42M", trend: "up", change: "+8.1%" },
-      { label: "Retention Rate (D7)", value: "41.2%", trend: "down", change: "-2.3%" },
-      { label: "Avg Session Duration", value: "24m 18s", trend: "up", change: "+5.7%" },
-      { label: "New Users (Today)", value: "9,812", trend: "up", change: "+18.6%" },
-      { label: "Conversion Rate", value: "3.8%", trend: "down", change: "-0.4%" },
+      { id: 1, label: "Daily Active Users", value: "128,430", trend: "up", change: "+12.4%" },
+      { id: 2, label: "Revenue (MTD)", value: "$1.42M", trend: "up", change: "+8.1%" },
+      { id: 3, label: "Retention Rate (D7)", value: "41.2%", trend: "down", change: "-2.3%" },
+      { id: 4, label: "Avg Session Duration", value: "24m 18s", trend: "up", change: "+5.7%" },
+      { id: 5, label: "New Users (Today)", value: "9,812", trend: "up", change: "+18.6%" },
+      { id: 6, label: "Conversion Rate", value: "3.8%", trend: "down", change: "-0.4%" },
     ];
   }
 };
@@ -438,6 +482,10 @@ function renderBuilds() {
       <td>${b.duration}</td>
       <td>${b.triggeredBy}</td>
       <td>${b.timestamp}</td>
+      <td>
+        <button class="btn-icon" onclick="editBuild(${b.id})" title="Edit Build">✏️</button>
+        <button class="btn-icon" onclick="deleteBuild(${b.id})" title="Delete Build">🗑️</button>
+      </td>
     </tr>
   `).join("");
 }
@@ -496,6 +544,10 @@ function renderKPIs() {
       <div class="kpi-value">${k.value}</div>
       <div class="kpi-trend ${k.trend}">
         ${k.trend === "up" ? "▲" : "▼"} ${k.change}
+      </div>
+      <div class="card-actions">
+        <button class="btn-icon" onclick="editKPI(${k.id})" title="Edit KPI">✏️</button>
+        <button class="btn-icon" onclick="deleteKPI(${k.id})" title="Delete KPI">🗑️</button>
       </div>
     </div>
   `).join("");
@@ -775,6 +827,109 @@ function addNewEvent() {
   });
   
   renderEvents();
+}
+
+// Builds
+function editBuild(id) {
+  const build = DataService.getBuilds().find(b => b.id === id);
+  if (!build) return;
+  
+  const project = prompt("Project:", build.project);
+  if (!project) return;
+  
+  const branch = prompt("Branch:", build.branch);
+  const status = prompt("Status (Success/Failed/In Progress):", build.status);
+  const duration = prompt("Duration (e.g., 4m 32s):", build.duration);
+  const triggeredBy = prompt("Triggered By:", build.triggeredBy);
+  
+  DataService.updateBuild(id, {
+    project,
+    branch: branch || build.branch,
+    status: status || build.status,
+    duration: duration || build.duration,
+    triggeredBy: triggeredBy || build.triggeredBy,
+    timestamp: build.timestamp
+  });
+  
+  renderBuilds();
+}
+
+function deleteBuild(id) {
+  if (confirm("Are you sure you want to delete this build?")) {
+    DataService.deleteBuild(id);
+    renderBuilds();
+  }
+}
+
+function addNewBuild() {
+  const project = prompt("Project:");
+  if (!project) return;
+  
+  const branch = prompt("Branch:", "main");
+  const status = prompt("Status (Success/Failed/In Progress):", "In Progress");
+  const duration = prompt("Duration (e.g., 4m 32s):", "0m 00s");
+  const triggeredBy = prompt("Triggered By:");
+  
+  const now = new Date();
+  const timestamp = now.toISOString().split('T')[0] + ' ' + now.toTimeString().split(' ')[0].slice(0, 5);
+  
+  DataService.addBuild({
+    project,
+    branch: branch || "main",
+    status: status || "In Progress",
+    duration: duration || "0m 00s",
+    triggeredBy: triggeredBy || "Manual",
+    timestamp
+  });
+  
+  renderBuilds();
+}
+
+// KPIs
+function editKPI(id) {
+  const kpi = DataService.getKPIs().find(k => k.id === id);
+  if (!kpi) return;
+  
+  const label = prompt("KPI Label:", kpi.label);
+  if (!label) return;
+  
+  const value = prompt("Value:", kpi.value);
+  const trend = prompt("Trend (up/down):", kpi.trend);
+  const change = prompt("Change (e.g., +12.4%):", kpi.change);
+  
+  DataService.updateKPI(id, {
+    label,
+    value: value || kpi.value,
+    trend: trend || kpi.trend,
+    change: change || kpi.change
+  });
+  
+  renderKPIs();
+}
+
+function deleteKPI(id) {
+  if (confirm("Are you sure you want to delete this KPI?")) {
+    DataService.deleteKPI(id);
+    renderKPIs();
+  }
+}
+
+function addNewKPI() {
+  const label = prompt("KPI Label:");
+  if (!label) return;
+  
+  const value = prompt("Value:", "0");
+  const trend = prompt("Trend (up/down):", "up");
+  const change = prompt("Change (e.g., +12.4%):", "+0.0%");
+  
+  DataService.addKPI({
+    label,
+    value: value || "0",
+    trend: trend || "up",
+    change: change || "+0.0%"
+  });
+  
+  renderKPIs();
 }
 
 // Data Management
