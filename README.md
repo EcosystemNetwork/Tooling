@@ -1,44 +1,67 @@
-# Dev Tools Control Center (DTCC)
+# GameForge — Browser Game Dev Tooling
 
-A comprehensive web-based dashboard application for managing development projects, assets, team members, and events. This application features persistent data storage using LocalStorage, allowing you to enter and manage real data.
+A comprehensive web-based dashboard for browser-based 3D game development with **Three.js** and **Babylon.js**. Manage scenes, shaders, code snippets, assets, performance metrics, and your entire game dev pipeline — all from one place. Features persistent data storage using LocalStorage.
 
 ## Features
 
 ### 📊 Project Dashboard
-- View and manage multiple development projects
-- Track project status, team size, and completion percentage
+- View and manage multiple game development projects
+- Track project status, team size, engine (Three.js / Babylon.js), and completion percentage
 - Add, edit, and delete projects
-- Monitor last updated dates
+
+### 🌐 Scene Manager
+- Manage 3D scene configurations for Three.js and Babylon.js
+- Track camera types, light counts, mesh counts, and texture usage per scene
+- Tag scenes with objects (Skybox, Physics, NavMesh, PostProcessing, etc.)
+- Filter scenes by engine (Three.js / Babylon.js)
+
+### ✨ Shader Library
+- Organize and manage vertex, fragment, post-process, and compute shaders
+- Visual gradient preview for each shader
+- Tag-based categorization (Lighting, PBR, VFX, Water, etc.)
+- Filter shaders by type
+
+### 📝 Code Snippets Library
+- Reusable code patterns for Three.js, Babylon.js, GLSL, and WebGPU
+- Searchable and filterable by engine and category
+- One-click copy to clipboard
+- Categories include Setup, Shaders, Physics, Assets, Interaction, Audio, and more
 
 ### 🎨 Asset Manager
-- Organize and categorize development assets (3D Models, Textures, Audio, Animations, UI Elements)
+- Organize game assets across 10 categories: 3D Models, Textures, Audio, Animations, UI Elements, Materials, Shaders, Prefabs, and Skyboxes
 - Search and filter assets by type
 - Track asset metadata including size and author
-- Add, edit, and delete assets
+
+### ⚡ Performance Monitor
+- Track WebGL/WebGPU performance metrics (draw calls, triangle count, frame time, etc.)
+- Color-coded progress bars (green/yellow/red) based on thresholds
+- Optimization tips for each metric
+- Overview stats panel for key indicators
 
 ### 🚀 Build & Deploy Pipeline
 - Monitor build and deployment status
-- Track build duration and triggered by information
+- Track build duration and triggered-by information
 - View build history with timestamps
-- Add, edit, and delete build entries
 
 ### 👥 Team Management
 - Manage team members and their roles (Admin, Developer, Artist, QA, Viewer)
 - Track member status and last login times
-- Add, edit, and delete team members
 - Assign role-based permissions
 
 ### 📅 Events Schedule
 - Schedule and track live operations and events
 - Categorize events by type (Seasonal, Update, Tournament, Hotfix)
 - Monitor event status (Upcoming, Live, Ended)
-- Add, edit, and delete events
+
+### 📚 Documentation & Resources
+- Quick links to Three.js and Babylon.js official docs, examples, playgrounds, and forums
+- Essential tools section with links to physics engines (Cannon-es, Rapier), debug tools (Spector.js, Tweakpane), and utilities (glTF Report)
+- Learning resources including Three.js Journey, WebGL/WebGPU Fundamentals, Book of Shaders, and Shadertoy
 
 ### 📈 Analytics & KPIs
-- View key performance indicators
-- Track metrics with trend indicators
-- Monitor daily active users, revenue, retention rate, and more
-- Add, edit, and delete KPI entries
+- View key performance indicators including player-facing metrics
+- Track FPS averages and WebGL crash rates alongside business metrics
+- Trend indicators for each KPI
 
 ### 💾 Data Management
 - **Persistent Storage**: All data is automatically saved to browser LocalStorage
@@ -80,11 +103,15 @@ xdg-open index.html # Linux
 Each section has an "Add" button in the top-right corner:
 
 1. **Add Project**: Click "+ Add Project" in the Dashboard section
-2. **Add Asset**: Click "+ Add Asset" in the Asset Manager section
-3. **Add Build**: Click "+ Add Build" in the Build Pipeline section
-4. **Add Team Member**: Click "+ Add Member" in the Team section
-5. **Add Event**: Click "+ Add Event" in the Events section
-6. **Add KPI**: Click "+ Add KPI" in the Analytics section
+2. **Add Scene**: Click "+ Add Scene" in the Scene Manager section
+3. **Add Shader**: Click "+ Add Shader" in the Shader Library section
+4. **Add Snippet**: Click "+ Add Snippet" in the Code Snippets section
+5. **Add Asset**: Click "+ Add Asset" in the Asset Manager section
+6. **Add Metric**: Click "+ Add Metric" in the Performance Monitor section
+7. **Add Build**: Click "+ Add Build" in the Build Pipeline section
+8. **Add Team Member**: Click "+ Add Member" in the Team section
+9. **Add Event**: Click "+ Add Event" in the Events section
+10. **Add KPI**: Click "+ Add KPI" in the Analytics section
 
 Follow the prompts to enter the required information.
 
@@ -106,7 +133,13 @@ Each item has a delete button (🗑️):
 
 **Asset Search**: Use the search bar in the Asset Manager to find assets by name or author.
 
-**Asset Type Filter**: Click on type tags (All, 3D Models, Textures, etc.) to filter assets by category.
+**Asset Type Filter**: Click on type tags (All, 3D Models, Textures, Materials, Shaders, Prefabs, Skyboxes, etc.) to filter assets by category.
+
+**Scene Engine Filter**: Use the engine toggle buttons (All Engines, Three.js, Babylon.js) to filter scenes by engine.
+
+**Shader Type Filter**: Click on type tags (All, Vertex, Fragment, Post-Process, Compute) to filter shaders.
+
+**Snippet Search & Filter**: Use the search bar and engine filter buttons (All, Three.js, Babylon.js, GLSL, WebGPU) to find code snippets.
 
 ### Data Management
 
@@ -122,12 +155,16 @@ All data is stored in browser LocalStorage with the following keys:
 
 ```javascript
 {
-  "projects": [...],      // Project entries
+  "projects": [...],      // Game project entries
+  "scenes": [...],        // 3D scene configurations
+  "shaders": [...],       // Shader library entries
+  "snippets": [...],      // Code snippet entries
   "assets": [...],        // Asset entries
+  "perfMetrics": [...],   // Performance metric entries
   "builds": [...],        // Build history
   "teamMembers": [...],   // Team member profiles
   "events": [...],        // Event schedules
-  "kpis": [...]          // KPI metrics
+  "kpis": [...]           // KPI metrics
 }
 ```
 
@@ -137,11 +174,53 @@ All data is stored in browser LocalStorage with the following keys:
 ```json
 {
   "id": 1,
-  "name": "Nebula Frontier",
+  "name": "Nebula Frontier (Three.js)",
   "status": "Active",
+  "engine": "Three.js",
   "teamSize": 24,
   "lastUpdated": "2026-02-10",
   "completion": 78
+}
+```
+
+**Scene**:
+```json
+{
+  "id": 1,
+  "name": "Battle Arena",
+  "engine": "Babylon.js",
+  "camera": "ArcRotateCamera",
+  "lights": 5,
+  "meshes": 48,
+  "textures": 22,
+  "status": "Active",
+  "objects": ["Terrain", "PhysicsWorld", "NavMesh", "Shadows", "Water"]
+}
+```
+
+**Shader**:
+```json
+{
+  "id": 1,
+  "name": "Toon Cel Shader",
+  "type": "Fragment",
+  "engine": "Three.js",
+  "description": "Classic cel-shading with configurable edge detection",
+  "color1": "#ff6b9d",
+  "color2": "#c44569",
+  "tags": ["Lighting", "NPR", "Stylized"]
+}
+```
+
+**Code Snippet**:
+```json
+{
+  "id": 1,
+  "title": "Three.js Scene Setup",
+  "engine": "Three.js",
+  "category": "Setup",
+  "description": "Basic Three.js scene with renderer, camera, and animation loop.",
+  "code": "const scene = new THREE.Scene(); ..."
 }
 ```
 
@@ -206,7 +285,11 @@ LocalStorage must be enabled in your browser.
 
 Edit the `getDefault*()` methods in `app.js` to change the initial example data:
 - `getDefaultProjects()`
+- `getDefaultScenes()`
+- `getDefaultShaders()`
+- `getDefaultSnippets()`
 - `getDefaultAssets()`
+- `getDefaultPerfMetrics()`
 - `getDefaultBuilds()`
 - `getDefaultTeamMembers()`
 - `getDefaultEvents()`
@@ -256,11 +339,15 @@ To make this a production-ready application with real data sharing:
 1. **Backend API**: Add a Node.js/Express backend with database (PostgreSQL, MongoDB)
 2. **Authentication**: Implement user login and authentication
 3. **Real-time Sync**: Add WebSocket support for live updates
-4. **File Uploads**: Support actual file uploads for assets
+4. **File Uploads**: Support actual file uploads for 3D models, textures, and audio
 5. **Multi-user**: Add collaboration features and permissions
 6. **Cloud Storage**: Store assets in cloud storage (AWS S3, Azure Blob)
-7. **Advanced Analytics**: Integrate with analytics platforms
-8. **API Integration**: Connect to CI/CD tools, project management systems
+7. **Integrated 3D Preview**: Embed live Three.js/Babylon.js scene previews in the Scene Manager
+8. **Shader Playground**: Add a live GLSL editor with real-time preview
+9. **Performance Profiling**: Connect to real WebGL context for live performance monitoring
+10. **Asset Pipeline Integration**: Connect to glTF pipeline tools for optimization
+11. **Version Control**: Track asset and scene version history
+12. **API Integration**: Connect to CI/CD tools, project management systems
 
 ## License
 
