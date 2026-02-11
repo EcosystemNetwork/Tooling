@@ -616,359 +616,562 @@ function setupNavLinks() {
   });
 }
 
+// ===== Modal & Toast System =====
+
+function escapeHTML(str) {
+  var div = document.createElement("div");
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+}
+
+function showToast(message, type) {
+  type = type || "success";
+  var container = document.getElementById("toastContainer");
+  var toast = document.createElement("div");
+  toast.className = "toast toast-" + type;
+  toast.setAttribute("role", "status");
+  var icons = { success: "✅", error: "❌", info: "ℹ️" };
+  toast.textContent = (icons[type] || "") + " " + message;
+  container.appendChild(toast);
+  setTimeout(function() {
+    toast.classList.add("toast-out");
+    setTimeout(function() { toast.remove(); }, 300);
+  }, 3000);
+}
+
+function openModal(title, bodyHTML, onConfirm, confirmLabel, confirmClass) {
+  var overlay = document.getElementById("modalOverlay");
+  var titleEl = document.getElementById("modalTitle");
+  var bodyEl = document.getElementById("modalBody");
+  var confirmBtn = document.getElementById("modalConfirm");
+  var cancelBtn = document.getElementById("modalCancel");
+  var closeBtn = document.getElementById("modalClose");
+
+  titleEl.textContent = title;
+  bodyEl.innerHTML = bodyHTML;
+  confirmBtn.textContent = confirmLabel || "Save";
+  confirmBtn.className = "modal-btn " + (confirmClass || "modal-btn-confirm");
+
+  overlay.classList.add("open");
+
+  // Focus first input
+  var firstInput = bodyEl.querySelector("input, select, textarea");
+  if (firstInput) setTimeout(function() { firstInput.focus(); }, 50);
+
+  function cleanup() {
+    overlay.classList.remove("open");
+    confirmBtn.removeEventListener("click", handleConfirm);
+    cancelBtn.removeEventListener("click", cleanup);
+    closeBtn.removeEventListener("click", cleanup);
+    overlay.removeEventListener("click", handleOverlayClick);
+  }
+
+  function handleConfirm() {
+    if (onConfirm) {
+      var result = onConfirm();
+      if (result === false) return;
+    }
+    cleanup();
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === overlay) cleanup();
+  }
+
+  confirmBtn.addEventListener("click", handleConfirm);
+  cancelBtn.addEventListener("click", cleanup);
+  closeBtn.addEventListener("click", cleanup);
+  overlay.addEventListener("click", handleOverlayClick);
+}
+
+function confirmModal(message, onConfirm) {
+  openModal(
+    "Confirm Action",
+    '<p class="confirm-message">' + message + '</p>',
+    onConfirm,
+    "Delete",
+    "modal-btn-danger"
+  );
+}
+
+function selectOptions(options, selected) {
+  return options.map(function(opt) {
+    var escaped = escapeHTML(opt);
+    return '<option value="' + escaped + '"' + (opt === selected ? ' selected' : '') + '>' + escaped + '</option>';
+  }).join("");
+}
+
 // ===== CRUD Operations =====
 
 // Projects
+function projectFormHTML(p) {
+  p = p || {};
+  return '' +
+    '<div class="form-group">' +
+      '<label class="form-label">Project Name</label>' +
+      '<input class="form-input" id="f-name" type="text" value="' + escapeHTML(p.name || '') + '" placeholder="Enter project name">' +
+    '</div>' +
+    '<div class="form-row">' +
+      '<div class="form-group">' +
+        '<label class="form-label">Status</label>' +
+        '<select class="form-select" id="f-status">' + selectOptions(["Active", "Beta", "Alpha", "Maintenance"], p.status || "Active") + '</select>' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label class="form-label">Team Size</label>' +
+        '<input class="form-input" id="f-teamSize" type="number" min="1" value="' + escapeHTML(String(p.teamSize || 10)) + '">' +
+      '</div>' +
+    '</div>' +
+    '<div class="form-group">' +
+      '<label class="form-label">Completion %</label>' +
+      '<input class="form-input" id="f-completion" type="number" min="0" max="100" value="' + escapeHTML(String(p.completion || 0)) + '">' +
+    '</div>';
+}
+
 function editProject(id) {
-  const project = DataService.getProjects().find(p => p.id === id);
+  var project = DataService.getProjects().find(function(p) { return p.id === id; });
   if (!project) return;
-  
-  const name = prompt("Project Name:", project.name);
-  if (!name) return;
-  
-  const status = prompt("Status (Active/Beta/Alpha/Maintenance):", project.status);
-  const teamSize = parseInt(prompt("Team Size:", project.teamSize));
-  const completion = parseInt(prompt("Completion %:", project.completion));
-  
-  DataService.updateProject(id, {
-    name,
-    status: status || project.status,
-    teamSize: teamSize || project.teamSize,
-    completion: completion || project.completion,
-    lastUpdated: new Date().toISOString().split('T')[0]
+  openModal("Edit Project", projectFormHTML(project), function() {
+    var name = document.getElementById("f-name").value.trim();
+    if (!name) { showToast("Name is required", "error"); return false; }
+    DataService.updateProject(id, {
+      name: name,
+      status: document.getElementById("f-status").value,
+      teamSize: parseInt(document.getElementById("f-teamSize").value) || project.teamSize,
+      completion: parseInt(document.getElementById("f-completion").value) || project.completion,
+      lastUpdated: new Date().toISOString().split('T')[0]
+    });
+    renderProjects();
+    showToast("Project updated");
   });
-  
-  renderProjects();
 }
 
 function deleteProject(id) {
-  if (confirm("Are you sure you want to delete this project?")) {
+  confirmModal("Are you sure you want to delete this project?", function() {
     DataService.deleteProject(id);
     renderProjects();
-  }
+    showToast("Project deleted", "info");
+  });
 }
 
 function addNewProject() {
-  const name = prompt("Project Name:");
-  if (!name) return;
-  
-  const status = prompt("Status (Active/Beta/Alpha/Maintenance):", "Active");
-  const teamSize = parseInt(prompt("Team Size:", "10"));
-  const completion = parseInt(prompt("Completion %:", "0"));
-  
-  DataService.addProject({
-    name,
-    status: status || "Active",
-    teamSize: teamSize || 10,
-    completion: completion || 0,
-    lastUpdated: new Date().toISOString().split('T')[0]
+  openModal("Add Project", projectFormHTML(), function() {
+    var name = document.getElementById("f-name").value.trim();
+    if (!name) { showToast("Name is required", "error"); return false; }
+    DataService.addProject({
+      name: name,
+      status: document.getElementById("f-status").value,
+      teamSize: parseInt(document.getElementById("f-teamSize").value) || 10,
+      completion: parseInt(document.getElementById("f-completion").value) || 0,
+      lastUpdated: new Date().toISOString().split('T')[0]
+    });
+    renderProjects();
+    showToast("Project added");
   });
-  
-  renderProjects();
 }
 
 // Assets
+function assetFormHTML(a) {
+  a = a || {};
+  return '' +
+    '<div class="form-group">' +
+      '<label class="form-label">Asset Name</label>' +
+      '<input class="form-input" id="f-name" type="text" value="' + escapeHTML(a.name || '') + '" placeholder="Enter asset name">' +
+    '</div>' +
+    '<div class="form-row">' +
+      '<div class="form-group">' +
+        '<label class="form-label">Type</label>' +
+        '<select class="form-select" id="f-type">' + selectOptions(["3D Models", "Textures", "Audio", "Animations", "UI Elements"], a.type || "3D Models") + '</select>' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label class="form-label">Size</label>' +
+        '<input class="form-input" id="f-size" type="text" value="' + escapeHTML(a.size || '1.0 MB') + '" placeholder="e.g., 10.5 MB">' +
+      '</div>' +
+    '</div>' +
+    '<div class="form-row">' +
+      '<div class="form-group">' +
+        '<label class="form-label">Author</label>' +
+        '<input class="form-input" id="f-author" type="text" value="' + escapeHTML(a.author || '') + '" placeholder="Author name">' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label class="form-label">Color</label>' +
+        '<input class="form-input" id="f-color" type="color" value="' + escapeHTML(a.color || '#1e88e5') + '">' +
+      '</div>' +
+    '</div>';
+}
+
 function editAsset(id) {
-  const asset = DataService.getAssets().find(a => a.id === id);
+  var asset = DataService.getAssets().find(function(a) { return a.id === id; });
   if (!asset) return;
-  
-  const name = prompt("Asset Name:", asset.name);
-  if (!name) return;
-  
-  const type = prompt("Type (3D Models/Textures/Audio/Animations/UI Elements):", asset.type);
-  const size = prompt("Size (e.g., 10.5 MB):", asset.size);
-  const author = prompt("Author:", asset.author);
-  const color = prompt("Color (hex code):", asset.color);
-  
-  DataService.updateAsset(id, {
-    name,
-    type: type || asset.type,
-    size: size || asset.size,
-    author: author || asset.author,
-    color: color || asset.color
+  openModal("Edit Asset", assetFormHTML(asset), function() {
+    var name = document.getElementById("f-name").value.trim();
+    if (!name) { showToast("Name is required", "error"); return false; }
+    DataService.updateAsset(id, {
+      name: name,
+      type: document.getElementById("f-type").value,
+      size: document.getElementById("f-size").value || asset.size,
+      author: document.getElementById("f-author").value || asset.author,
+      color: document.getElementById("f-color").value || asset.color
+    });
+    assets = DataService.getAssets();
+    renderAssets();
+    showToast("Asset updated");
   });
-  
-  assets = DataService.getAssets();
-  renderAssets();
 }
 
 function deleteAsset(id) {
-  if (confirm("Are you sure you want to delete this asset?")) {
+  confirmModal("Are you sure you want to delete this asset?", function() {
     DataService.deleteAsset(id);
     assets = DataService.getAssets();
     renderAssets();
-  }
+    showToast("Asset deleted", "info");
+  });
 }
 
 function addNewAsset() {
-  const name = prompt("Asset Name:");
-  if (!name) return;
-  
-  const type = prompt("Type (3D Models/Textures/Audio/Animations/UI Elements):", "3D Models");
-  const size = prompt("Size (e.g., 10.5 MB):", "1.0 MB");
-  const author = prompt("Author:");
-  const color = prompt("Color (hex code):", "#1e88e5");
-  
-  DataService.addAsset({
-    name,
-    type: type || "3D Models",
-    size: size || "1.0 MB",
-    author: author || "Unknown",
-    color: color || "#1e88e5"
+  openModal("Add Asset", assetFormHTML(), function() {
+    var name = document.getElementById("f-name").value.trim();
+    if (!name) { showToast("Name is required", "error"); return false; }
+    DataService.addAsset({
+      name: name,
+      type: document.getElementById("f-type").value,
+      size: document.getElementById("f-size").value || "1.0 MB",
+      author: document.getElementById("f-author").value || "Unknown",
+      color: document.getElementById("f-color").value || "#1e88e5"
+    });
+    assets = DataService.getAssets();
+    renderAssets();
+    showToast("Asset added");
   });
-  
-  assets = DataService.getAssets();
-  renderAssets();
 }
 
 // Team Members
+function teamFormHTML(m) {
+  m = m || {};
+  return '' +
+    '<div class="form-row">' +
+      '<div class="form-group">' +
+        '<label class="form-label">Name</label>' +
+        '<input class="form-input" id="f-name" type="text" value="' + escapeHTML(m.name || '') + '" placeholder="Full name">' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label class="form-label">Email</label>' +
+        '<input class="form-input" id="f-email" type="email" value="' + escapeHTML(m.email || '') + '" placeholder="email@example.com">' +
+      '</div>' +
+    '</div>' +
+    '<div class="form-row">' +
+      '<div class="form-group">' +
+        '<label class="form-label">Role</label>' +
+        '<select class="form-select" id="f-role">' + selectOptions(["Admin", "Developer", "Artist", "QA", "Viewer"], m.role || "Developer") + '</select>' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label class="form-label">Status</label>' +
+        '<select class="form-select" id="f-status">' + selectOptions(["Active", "Inactive"], m.status || "Active") + '</select>' +
+      '</div>' +
+    '</div>' +
+    '<div class="form-group">' +
+      '<label class="form-label">Avatar Color</label>' +
+      '<input class="form-input" id="f-color" type="color" value="' + escapeHTML(m.color || '#1e88e5') + '">' +
+    '</div>';
+}
+
 function editTeamMember(id) {
-  const member = DataService.getTeamMembers().find(m => m.id === id);
+  var member = DataService.getTeamMembers().find(function(m) { return m.id === id; });
   if (!member) return;
-  
-  const name = prompt("Member Name:", member.name);
-  if (!name) return;
-  
-  const email = prompt("Email:", member.email);
-  const role = prompt("Role (Admin/Developer/Artist/QA/Viewer):", member.role);
-  const status = prompt("Status (Active/Inactive):", member.status);
-  const color = prompt("Color (hex code):", member.color);
-  
-  DataService.updateTeamMember(id, {
-    name,
-    email: email || member.email,
-    role: role || member.role,
-    status: status || member.status,
-    color: color || member.color,
-    lastLogin: new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0].slice(0, 5)
+  openModal("Edit Team Member", teamFormHTML(member), function() {
+    var name = document.getElementById("f-name").value.trim();
+    if (!name) { showToast("Name is required", "error"); return false; }
+    DataService.updateTeamMember(id, {
+      name: name,
+      email: document.getElementById("f-email").value || member.email,
+      role: document.getElementById("f-role").value,
+      status: document.getElementById("f-status").value,
+      color: document.getElementById("f-color").value || member.color,
+      lastLogin: new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0].slice(0, 5)
+    });
+    renderTeam();
+    showToast("Team member updated");
   });
-  
-  renderTeam();
 }
 
 function deleteTeamMember(id) {
-  if (confirm("Are you sure you want to delete this team member?")) {
+  confirmModal("Are you sure you want to delete this team member?", function() {
     DataService.deleteTeamMember(id);
     renderTeam();
-  }
+    showToast("Team member deleted", "info");
+  });
 }
 
 function addNewTeamMember() {
-  const name = prompt("Member Name:");
-  if (!name) return;
-  
-  const email = prompt("Email:");
-  const role = prompt("Role (Admin/Developer/Artist/QA/Viewer):", "Developer");
-  const status = prompt("Status (Active/Inactive):", "Active");
-  const color = prompt("Color (hex code):", "#1e88e5");
-  
-  DataService.addTeamMember({
-    name,
-    email: email || "user@studio.io",
-    role: role || "Developer",
-    status: status || "Active",
-    color: color || "#1e88e5",
-    lastLogin: new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0].slice(0, 5)
+  openModal("Add Team Member", teamFormHTML(), function() {
+    var name = document.getElementById("f-name").value.trim();
+    if (!name) { showToast("Name is required", "error"); return false; }
+    DataService.addTeamMember({
+      name: name,
+      email: document.getElementById("f-email").value || "user@studio.io",
+      role: document.getElementById("f-role").value,
+      status: document.getElementById("f-status").value,
+      color: document.getElementById("f-color").value || "#1e88e5",
+      lastLogin: new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0].slice(0, 5)
+    });
+    renderTeam();
+    showToast("Team member added");
   });
-  
-  renderTeam();
 }
 
 // Events
+function eventFormHTML(e) {
+  e = e || {};
+  var today = new Date().toISOString().split('T')[0];
+  return '' +
+    '<div class="form-group">' +
+      '<label class="form-label">Event Name</label>' +
+      '<input class="form-input" id="f-name" type="text" value="' + escapeHTML(e.name || '') + '" placeholder="Enter event name">' +
+    '</div>' +
+    '<div class="form-group">' +
+      '<label class="form-label">Game</label>' +
+      '<input class="form-input" id="f-game" type="text" value="' + escapeHTML(e.game || '') + '" placeholder="Game title">' +
+    '</div>' +
+    '<div class="form-row">' +
+      '<div class="form-group">' +
+        '<label class="form-label">Start Date</label>' +
+        '<input class="form-input" id="f-start" type="date" value="' + escapeHTML(e.start || today) + '">' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label class="form-label">End Date</label>' +
+        '<input class="form-input" id="f-end" type="date" value="' + escapeHTML(e.end || today) + '">' +
+      '</div>' +
+    '</div>' +
+    '<div class="form-row">' +
+      '<div class="form-group">' +
+        '<label class="form-label">Status</label>' +
+        '<select class="form-select" id="f-status">' + selectOptions(["Upcoming", "Live", "Ended"], e.status || "Upcoming") + '</select>' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label class="form-label">Type</label>' +
+        '<select class="form-select" id="f-type">' + selectOptions(["Seasonal", "Update", "Tournament", "Hotfix"], e.type || "Update") + '</select>' +
+      '</div>' +
+    '</div>';
+}
+
 function editEvent(id) {
-  const event = DataService.getEvents().find(e => e.id === id);
+  var event = DataService.getEvents().find(function(e) { return e.id === id; });
   if (!event) return;
-  
-  const name = prompt("Event Name:", event.name);
-  if (!name) return;
-  
-  const game = prompt("Game:", event.game);
-  const start = prompt("Start Date (YYYY-MM-DD):", event.start);
-  const end = prompt("End Date (YYYY-MM-DD):", event.end);
-  const status = prompt("Status (Upcoming/Live/Ended):", event.status);
-  const type = prompt("Type (Seasonal/Update/Tournament/Hotfix):", event.type);
-  
-  DataService.updateEvent(id, {
-    name,
-    game: game || event.game,
-    start: start || event.start,
-    end: end || event.end,
-    status: status || event.status,
-    type: type || event.type
+  openModal("Edit Event", eventFormHTML(event), function() {
+    var name = document.getElementById("f-name").value.trim();
+    if (!name) { showToast("Name is required", "error"); return false; }
+    DataService.updateEvent(id, {
+      name: name,
+      game: document.getElementById("f-game").value || event.game,
+      start: document.getElementById("f-start").value || event.start,
+      end: document.getElementById("f-end").value || event.end,
+      status: document.getElementById("f-status").value,
+      type: document.getElementById("f-type").value
+    });
+    renderEvents();
+    showToast("Event updated");
   });
-  
-  renderEvents();
 }
 
 function deleteEvent(id) {
-  if (confirm("Are you sure you want to delete this event?")) {
+  confirmModal("Are you sure you want to delete this event?", function() {
     DataService.deleteEvent(id);
     renderEvents();
-  }
+    showToast("Event deleted", "info");
+  });
 }
 
 function addNewEvent() {
-  const name = prompt("Event Name:");
-  if (!name) return;
-  
-  const game = prompt("Game:");
-  const start = prompt("Start Date (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
-  const end = prompt("End Date (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
-  const status = prompt("Status (Upcoming/Live/Ended):", "Upcoming");
-  const type = prompt("Type (Seasonal/Update/Tournament/Hotfix):", "Update");
-  
-  DataService.addEvent({
-    name,
-    game: game || "Unknown Game",
-    start: start || new Date().toISOString().split('T')[0],
-    end: end || new Date().toISOString().split('T')[0],
-    status: status || "Upcoming",
-    type: type || "Update"
+  openModal("Add Event", eventFormHTML(), function() {
+    var name = document.getElementById("f-name").value.trim();
+    if (!name) { showToast("Name is required", "error"); return false; }
+    DataService.addEvent({
+      name: name,
+      game: document.getElementById("f-game").value || "Unknown Game",
+      start: document.getElementById("f-start").value || new Date().toISOString().split('T')[0],
+      end: document.getElementById("f-end").value || new Date().toISOString().split('T')[0],
+      status: document.getElementById("f-status").value,
+      type: document.getElementById("f-type").value
+    });
+    renderEvents();
+    showToast("Event added");
   });
-  
-  renderEvents();
 }
 
 // Builds
+function buildFormHTML(b) {
+  b = b || {};
+  return '' +
+    '<div class="form-row">' +
+      '<div class="form-group">' +
+        '<label class="form-label">Project</label>' +
+        '<input class="form-input" id="f-project" type="text" value="' + escapeHTML(b.project || '') + '" placeholder="Project name">' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label class="form-label">Branch</label>' +
+        '<input class="form-input" id="f-branch" type="text" value="' + escapeHTML(b.branch || 'main') + '" placeholder="e.g., main">' +
+      '</div>' +
+    '</div>' +
+    '<div class="form-row">' +
+      '<div class="form-group">' +
+        '<label class="form-label">Status</label>' +
+        '<select class="form-select" id="f-status">' + selectOptions(["Success", "Failed", "In Progress"], b.status || "In Progress") + '</select>' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label class="form-label">Duration</label>' +
+        '<input class="form-input" id="f-duration" type="text" value="' + escapeHTML(b.duration || '0m 00s') + '" placeholder="e.g., 4m 32s">' +
+      '</div>' +
+    '</div>' +
+    '<div class="form-group">' +
+      '<label class="form-label">Triggered By</label>' +
+      '<input class="form-input" id="f-triggeredBy" type="text" value="' + escapeHTML(b.triggeredBy || '') + '" placeholder="Who triggered this build">' +
+    '</div>';
+}
+
 function editBuild(id) {
-  const build = DataService.getBuilds().find(b => b.id === id);
+  var build = DataService.getBuilds().find(function(b) { return b.id === id; });
   if (!build) return;
-  
-  const project = prompt("Project:", build.project);
-  if (!project) return;
-  
-  const branch = prompt("Branch:", build.branch);
-  const status = prompt("Status (Success/Failed/In Progress):", build.status);
-  const duration = prompt("Duration (e.g., 4m 32s):", build.duration);
-  const triggeredBy = prompt("Triggered By:", build.triggeredBy);
-  
-  DataService.updateBuild(id, {
-    project,
-    branch: branch || build.branch,
-    status: status || build.status,
-    duration: duration || build.duration,
-    triggeredBy: triggeredBy || build.triggeredBy,
-    timestamp: build.timestamp
+  openModal("Edit Build", buildFormHTML(build), function() {
+    var project = document.getElementById("f-project").value.trim();
+    if (!project) { showToast("Project name is required", "error"); return false; }
+    DataService.updateBuild(id, {
+      project: project,
+      branch: document.getElementById("f-branch").value || build.branch,
+      status: document.getElementById("f-status").value,
+      duration: document.getElementById("f-duration").value || build.duration,
+      triggeredBy: document.getElementById("f-triggeredBy").value || build.triggeredBy,
+      timestamp: build.timestamp
+    });
+    renderBuilds();
+    showToast("Build updated");
   });
-  
-  renderBuilds();
 }
 
 function deleteBuild(id) {
-  if (confirm("Are you sure you want to delete this build?")) {
+  confirmModal("Are you sure you want to delete this build?", function() {
     DataService.deleteBuild(id);
     renderBuilds();
-  }
+    showToast("Build deleted", "info");
+  });
 }
 
 function addNewBuild() {
-  const project = prompt("Project:");
-  if (!project) return;
-  
-  const branch = prompt("Branch:", "main");
-  const status = prompt("Status (Success/Failed/In Progress):", "In Progress");
-  const duration = prompt("Duration (e.g., 4m 32s):", "0m 00s");
-  const triggeredBy = prompt("Triggered By:");
-  
-  const now = new Date();
-  const timestamp = now.toISOString().split('T')[0] + ' ' + now.toTimeString().split(' ')[0].slice(0, 5);
-  
-  DataService.addBuild({
-    project,
-    branch: branch || "main",
-    status: status || "In Progress",
-    duration: duration || "0m 00s",
-    triggeredBy: triggeredBy || "Manual",
-    timestamp
+  openModal("Add Build", buildFormHTML(), function() {
+    var project = document.getElementById("f-project").value.trim();
+    if (!project) { showToast("Project name is required", "error"); return false; }
+    var now = new Date();
+    var timestamp = now.toISOString().split('T')[0] + ' ' + now.toTimeString().split(' ')[0].slice(0, 5);
+    DataService.addBuild({
+      project: project,
+      branch: document.getElementById("f-branch").value || "main",
+      status: document.getElementById("f-status").value,
+      duration: document.getElementById("f-duration").value || "0m 00s",
+      triggeredBy: document.getElementById("f-triggeredBy").value || "Manual",
+      timestamp: timestamp
+    });
+    renderBuilds();
+    showToast("Build added");
   });
-  
-  renderBuilds();
 }
 
 // KPIs
+function kpiFormHTML(k) {
+  k = k || {};
+  return '' +
+    '<div class="form-group">' +
+      '<label class="form-label">KPI Label</label>' +
+      '<input class="form-input" id="f-label" type="text" value="' + escapeHTML(k.label || '') + '" placeholder="e.g., Daily Active Users">' +
+    '</div>' +
+    '<div class="form-group">' +
+      '<label class="form-label">Value</label>' +
+      '<input class="form-input" id="f-value" type="text" value="' + escapeHTML(k.value || '0') + '" placeholder="e.g., 128,430">' +
+    '</div>' +
+    '<div class="form-row">' +
+      '<div class="form-group">' +
+        '<label class="form-label">Trend</label>' +
+        '<select class="form-select" id="f-trend">' + selectOptions(["up", "down"], k.trend || "up") + '</select>' +
+      '</div>' +
+      '<div class="form-group">' +
+        '<label class="form-label">Change</label>' +
+        '<input class="form-input" id="f-change" type="text" value="' + escapeHTML(k.change || '+0.0%') + '" placeholder="e.g., +12.4%">' +
+      '</div>' +
+    '</div>';
+}
+
 function editKPI(id) {
-  const kpi = DataService.getKPIs().find(k => k.id === id);
+  var kpi = DataService.getKPIs().find(function(k) { return k.id === id; });
   if (!kpi) return;
-  
-  const label = prompt("KPI Label:", kpi.label);
-  if (!label) return;
-  
-  const value = prompt("Value:", kpi.value);
-  const trend = prompt("Trend (up/down):", kpi.trend);
-  const change = prompt("Change (e.g., +12.4%):", kpi.change);
-  
-  DataService.updateKPI(id, {
-    label,
-    value: value || kpi.value,
-    trend: trend || kpi.trend,
-    change: change || kpi.change
+  openModal("Edit KPI", kpiFormHTML(kpi), function() {
+    var label = document.getElementById("f-label").value.trim();
+    if (!label) { showToast("Label is required", "error"); return false; }
+    DataService.updateKPI(id, {
+      label: label,
+      value: document.getElementById("f-value").value || kpi.value,
+      trend: document.getElementById("f-trend").value,
+      change: document.getElementById("f-change").value || kpi.change
+    });
+    renderKPIs();
+    showToast("KPI updated");
   });
-  
-  renderKPIs();
 }
 
 function deleteKPI(id) {
-  if (confirm("Are you sure you want to delete this KPI?")) {
+  confirmModal("Are you sure you want to delete this KPI?", function() {
     DataService.deleteKPI(id);
     renderKPIs();
-  }
+    showToast("KPI deleted", "info");
+  });
 }
 
 function addNewKPI() {
-  const label = prompt("KPI Label:");
-  if (!label) return;
-  
-  const value = prompt("Value:", "0");
-  const trend = prompt("Trend (up/down):", "up");
-  const change = prompt("Change (e.g., +12.4%):", "+0.0%");
-  
-  DataService.addKPI({
-    label,
-    value: value || "0",
-    trend: trend || "up",
-    change: change || "+0.0%"
+  openModal("Add KPI", kpiFormHTML(), function() {
+    var label = document.getElementById("f-label").value.trim();
+    if (!label) { showToast("Label is required", "error"); return false; }
+    DataService.addKPI({
+      label: label,
+      value: document.getElementById("f-value").value || "0",
+      trend: document.getElementById("f-trend").value,
+      change: document.getElementById("f-change").value || "+0.0%"
+    });
+    renderKPIs();
+    showToast("KPI added");
   });
-  
-  renderKPIs();
 }
 
 // Data Management
 function exportAllData() {
-  const data = DataService.exportData();
-  const dataStr = JSON.stringify(data, null, 2);
-  const dataBlob = new Blob([dataStr], { type: 'application/json' });
-  const url = URL.createObjectURL(dataBlob);
-  const link = document.createElement('a');
+  var data = DataService.exportData();
+  var dataStr = JSON.stringify(data, null, 2);
+  var dataBlob = new Blob([dataStr], { type: 'application/json' });
+  var url = URL.createObjectURL(dataBlob);
+  var link = document.createElement('a');
   link.href = url;
-  link.download = `dtcc-data-${new Date().toISOString().split('T')[0]}.json`;
+  link.download = 'dtcc-data-' + new Date().toISOString().split('T')[0] + '.json';
   link.click();
   URL.revokeObjectURL(url);
-  alert("Data exported successfully!");
+  showToast("Data exported successfully!");
 }
 
 function importData() {
-  const input = document.createElement('input');
+  var input = document.createElement('input');
   input.type = 'file';
   input.accept = '.json';
-  input.onchange = (e) => {
-    const file = e.target.files[0];
+  input.onchange = function(e) {
+    var file = e.target.files[0];
     if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = (event) => {
+    var reader = new FileReader();
+    reader.onload = function(event) {
       try {
-        const data = JSON.parse(event.target.result);
+        var data = JSON.parse(event.target.result);
         DataService.importData(data);
-        // Re-render all sections instead of reloading
         renderProjects();
         renderAssets();
         renderBuilds();
         renderTeam();
         renderEvents();
         renderKPIs();
-        alert("Data imported successfully!");
+        showToast("Data imported successfully!");
       } catch (err) {
-        alert("Error importing data: " + err.message);
+        showToast("Error importing data: " + err.message, "error");
       }
     };
     reader.readAsText(file);
@@ -977,17 +1180,16 @@ function importData() {
 }
 
 function resetData() {
-  if (confirm("Are you sure you want to reset all data to defaults? This cannot be undone.")) {
+  confirmModal("Are you sure you want to reset all data to defaults? This cannot be undone.", function() {
     DataService.resetToDefaults();
-    // Re-render all sections instead of reloading
     renderProjects();
     renderAssets();
     renderBuilds();
     renderTeam();
     renderEvents();
     renderKPIs();
-    alert("Data reset to defaults successfully!");
-  }
+    showToast("Data reset to defaults successfully!");
+  });
 }
 
 // ===== Init =====
