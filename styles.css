@@ -8,12 +8,12 @@
   --green-bright: #00e676;
   --green-dark: #00a884;
   --bg-body: #060e24;
-  --bg-card: rgba(14, 30, 66, 0.85);
-  --bg-card-hover: rgba(20, 42, 90, 0.95);
-  --text-primary: #e8eaf6;
-  --text-secondary: #90a4c4;
-  --text-muted: #5c7299;
-  --border-color: rgba(30, 136, 229, 0.2);
+  --bg-card: rgba(16, 36, 76, 0.92);
+  --bg-card-hover: rgba(22, 48, 100, 0.98);
+  --text-primary: #eef0ff;
+  --text-secondary: #a8bcd8;
+  --text-muted: #7a94b8;
+  --border-color: rgba(30, 136, 229, 0.35);
   --red: #ff5252;
   --orange: #ffab40;
   --sidebar-width: 240px;
@@ -47,14 +47,14 @@ body {
 .shape {
   position: absolute;
   border-radius: 50%;
-  opacity: 0.08;
+  opacity: 0.12;
   filter: blur(80px);
 }
 .shape-1 { width: 600px; height: 600px; background: var(--blue-accent); top: -200px; left: -100px; }
 .shape-2 { width: 450px; height: 450px; background: var(--green-primary); bottom: -150px; right: -100px; }
 .shape-3 { width: 300px; height: 300px; background: var(--green-bright); top: 40%; left: 50%; }
-.shape-4 { width: 200px; height: 200px; background: var(--blue-light); top: 20%; right: 10%; opacity: 0.06; }
-.shape-5 { width: 350px; height: 350px; background: var(--blue-accent); bottom: 30%; left: 20%; opacity: 0.05; }
+.shape-4 { width: 200px; height: 200px; background: var(--blue-light); top: 20%; right: 10%; opacity: 0.09; }
+.shape-5 { width: 350px; height: 350px; background: var(--blue-accent); bottom: 30%; left: 20%; opacity: 0.08; }
 
 /* ===== Top Header ===== */
 .top-header {
@@ -209,12 +209,13 @@ body {
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
   padding: 22px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
   transition: background 0.25s, transform 0.25s, box-shadow 0.25s;
 }
 .card:hover {
   background: var(--bg-card-hover);
   transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(0, 201, 167, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 201, 167, 0.18);
 }
 
 /* ===== Section 1: Project Dashboard ===== */
@@ -261,7 +262,7 @@ body {
 .project-meta span { display: flex; align-items: center; gap: 4px; }
 
 .progress-bar-wrapper {
-  background: rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.1);
   border-radius: 6px;
   height: 8px;
   overflow: hidden;
