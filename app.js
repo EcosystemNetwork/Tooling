@@ -1,64 +1,328 @@
-// ===== Mock Data =====
+// ===== Data Service Layer (LocalStorage Implementation) =====
 
-const projects = [
-  { name: "Nebula Frontier", status: "Active", teamSize: 24, lastUpdated: "2026-02-10", completion: 78 },
-  { name: "Shadowkeep Arena", status: "Beta", teamSize: 18, lastUpdated: "2026-02-08", completion: 92 },
-  { name: "Pixel Odyssey", status: "Alpha", teamSize: 12, lastUpdated: "2026-02-06", completion: 45 },
-  { name: "Titan Forge", status: "Maintenance", teamSize: 8, lastUpdated: "2025-12-20", completion: 100 },
-  { name: "Void Runners", status: "Active", teamSize: 20, lastUpdated: "2026-02-09", completion: 62 },
-];
+const DataService = {
+  // Storage keys
+  KEYS: {
+    PROJECTS: 'dtcc_projects',
+    ASSETS: 'dtcc_assets',
+    BUILDS: 'dtcc_builds',
+    TEAM_MEMBERS: 'dtcc_team_members',
+    EVENTS: 'dtcc_events',
+    KPIS: 'dtcc_kpis'
+  },
 
-const assets = [
-  { name: "Spaceship Hull", type: "3D Models", size: "14.2 MB", author: "J. Park", color: "#1e88e5" },
-  { name: "Lava Texture Pack", type: "Textures", size: "8.7 MB", author: "S. Chen", color: "#ff5252" },
-  { name: "Laser SFX Bundle", type: "Audio", size: "3.1 MB", author: "M. Rivera", color: "#00c9a7" },
-  { name: "Character Run Cycle", type: "Animations", size: "6.4 MB", author: "A. Kowalski", color: "#ffab40" },
-  { name: "HUD Crosshair Set", type: "UI Elements", size: "1.2 MB", author: "L. Nguyen", color: "#42a5f5" },
-  { name: "Forest Ambience", type: "Audio", size: "5.8 MB", author: "D. Okafor", color: "#00e676" },
-  { name: "Stone Wall Tileset", type: "Textures", size: "11.3 MB", author: "R. Müller", color: "#8d6e63" },
-  { name: "Dragon Rig", type: "3D Models", size: "22.6 MB", author: "K. Tanaka", color: "#7c4dff" },
-];
+  // Initialize with default data if empty
+  init() {
+    if (!localStorage.getItem(this.KEYS.PROJECTS)) {
+      this.saveProjects(this.getDefaultProjects());
+    }
+    if (!localStorage.getItem(this.KEYS.ASSETS)) {
+      this.saveAssets(this.getDefaultAssets());
+    }
+    if (!localStorage.getItem(this.KEYS.BUILDS)) {
+      this.saveBuilds(this.getDefaultBuilds());
+    }
+    if (!localStorage.getItem(this.KEYS.TEAM_MEMBERS)) {
+      this.saveTeamMembers(this.getDefaultTeamMembers());
+    }
+    if (!localStorage.getItem(this.KEYS.EVENTS)) {
+      this.saveEvents(this.getDefaultEvents());
+    }
+    if (!localStorage.getItem(this.KEYS.KPIS)) {
+      this.saveKPIs(this.getDefaultKPIs());
+    }
+  },
+
+  // Generic CRUD operations
+  load(key) {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : [];
+  },
+
+  save(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+  },
+
+  // Projects
+  getProjects() {
+    return this.load(this.KEYS.PROJECTS);
+  },
+
+  saveProjects(projects) {
+    this.save(this.KEYS.PROJECTS, projects);
+  },
+
+  addProject(project) {
+    const projects = this.getProjects();
+    project.id = Date.now();
+    projects.push(project);
+    this.saveProjects(projects);
+    return project;
+  },
+
+  updateProject(id, updatedData) {
+    const projects = this.getProjects();
+    const index = projects.findIndex(p => p.id === id);
+    if (index !== -1) {
+      projects[index] = { ...projects[index], ...updatedData };
+      this.saveProjects(projects);
+      return projects[index];
+    }
+    return null;
+  },
+
+  deleteProject(id) {
+    const projects = this.getProjects();
+    const filtered = projects.filter(p => p.id !== id);
+    this.saveProjects(filtered);
+  },
+
+  // Assets
+  getAssets() {
+    return this.load(this.KEYS.ASSETS);
+  },
+
+  saveAssets(assets) {
+    this.save(this.KEYS.ASSETS, assets);
+  },
+
+  addAsset(asset) {
+    const assets = this.getAssets();
+    asset.id = Date.now();
+    assets.push(asset);
+    this.saveAssets(assets);
+    return asset;
+  },
+
+  updateAsset(id, updatedData) {
+    const assets = this.getAssets();
+    const index = assets.findIndex(a => a.id === id);
+    if (index !== -1) {
+      assets[index] = { ...assets[index], ...updatedData };
+      this.saveAssets(assets);
+      return assets[index];
+    }
+    return null;
+  },
+
+  deleteAsset(id) {
+    const assets = this.getAssets();
+    const filtered = assets.filter(a => a.id !== id);
+    this.saveAssets(filtered);
+  },
+
+  // Builds
+  getBuilds() {
+    return this.load(this.KEYS.BUILDS);
+  },
+
+  saveBuilds(builds) {
+    this.save(this.KEYS.BUILDS, builds);
+  },
+
+  addBuild(build) {
+    const builds = this.getBuilds();
+    build.id = Date.now();
+    builds.unshift(build); // Add to beginning for most recent first
+    this.saveBuilds(builds);
+    return build;
+  },
+
+  // Team Members
+  getTeamMembers() {
+    return this.load(this.KEYS.TEAM_MEMBERS);
+  },
+
+  saveTeamMembers(members) {
+    this.save(this.KEYS.TEAM_MEMBERS, members);
+  },
+
+  addTeamMember(member) {
+    const members = this.getTeamMembers();
+    member.id = Date.now();
+    members.push(member);
+    this.saveTeamMembers(members);
+    return member;
+  },
+
+  updateTeamMember(id, updatedData) {
+    const members = this.getTeamMembers();
+    const index = members.findIndex(m => m.id === id);
+    if (index !== -1) {
+      members[index] = { ...members[index], ...updatedData };
+      this.saveTeamMembers(members);
+      return members[index];
+    }
+    return null;
+  },
+
+  deleteTeamMember(id) {
+    const members = this.getTeamMembers();
+    const filtered = members.filter(m => m.id !== id);
+    this.saveTeamMembers(filtered);
+  },
+
+  // Events
+  getEvents() {
+    return this.load(this.KEYS.EVENTS);
+  },
+
+  saveEvents(events) {
+    this.save(this.KEYS.EVENTS, events);
+  },
+
+  addEvent(event) {
+    const events = this.getEvents();
+    event.id = Date.now();
+    events.push(event);
+    this.saveEvents(events);
+    return event;
+  },
+
+  updateEvent(id, updatedData) {
+    const events = this.getEvents();
+    const index = events.findIndex(e => e.id === id);
+    if (index !== -1) {
+      events[index] = { ...events[index], ...updatedData };
+      this.saveEvents(events);
+      return events[index];
+    }
+    return null;
+  },
+
+  deleteEvent(id) {
+    const events = this.getEvents();
+    const filtered = events.filter(e => e.id !== id);
+    this.saveEvents(filtered);
+  },
+
+  // KPIs
+  getKPIs() {
+    return this.load(this.KEYS.KPIS);
+  },
+
+  saveKPIs(kpis) {
+    this.save(this.KEYS.KPIS, kpis);
+  },
+
+  // Export all data
+  exportData() {
+    return {
+      projects: this.getProjects(),
+      assets: this.getAssets(),
+      builds: this.getBuilds(),
+      teamMembers: this.getTeamMembers(),
+      events: this.getEvents(),
+      kpis: this.getKPIs()
+    };
+  },
+
+  // Import all data
+  importData(data) {
+    if (data.projects) this.saveProjects(data.projects);
+    if (data.assets) this.saveAssets(data.assets);
+    if (data.builds) this.saveBuilds(data.builds);
+    if (data.teamMembers) this.saveTeamMembers(data.teamMembers);
+    if (data.events) this.saveEvents(data.events);
+    if (data.kpis) this.saveKPIs(data.kpis);
+  },
+
+  // Reset to default data
+  resetToDefaults() {
+    this.saveProjects(this.getDefaultProjects());
+    this.saveAssets(this.getDefaultAssets());
+    this.saveBuilds(this.getDefaultBuilds());
+    this.saveTeamMembers(this.getDefaultTeamMembers());
+    this.saveEvents(this.getDefaultEvents());
+    this.saveKPIs(this.getDefaultKPIs());
+  },
+
+  // Default data sets
+  getDefaultProjects() {
+    return [
+      { id: 1, name: "Nebula Frontier", status: "Active", teamSize: 24, lastUpdated: "2026-02-10", completion: 78 },
+      { id: 2, name: "Shadowkeep Arena", status: "Beta", teamSize: 18, lastUpdated: "2026-02-08", completion: 92 },
+      { id: 3, name: "Pixel Odyssey", status: "Alpha", teamSize: 12, lastUpdated: "2026-02-06", completion: 45 },
+      { id: 4, name: "Titan Forge", status: "Maintenance", teamSize: 8, lastUpdated: "2025-12-20", completion: 100 },
+      { id: 5, name: "Void Runners", status: "Active", teamSize: 20, lastUpdated: "2026-02-09", completion: 62 },
+    ];
+  },
+
+  getDefaultAssets() {
+    return [
+      { id: 1, name: "Spaceship Hull", type: "3D Models", size: "14.2 MB", author: "J. Park", color: "#1e88e5" },
+      { id: 2, name: "Lava Texture Pack", type: "Textures", size: "8.7 MB", author: "S. Chen", color: "#ff5252" },
+      { id: 3, name: "Laser SFX Bundle", type: "Audio", size: "3.1 MB", author: "M. Rivera", color: "#00c9a7" },
+      { id: 4, name: "Character Run Cycle", type: "Animations", size: "6.4 MB", author: "A. Kowalski", color: "#ffab40" },
+      { id: 5, name: "HUD Crosshair Set", type: "UI Elements", size: "1.2 MB", author: "L. Nguyen", color: "#42a5f5" },
+      { id: 6, name: "Forest Ambience", type: "Audio", size: "5.8 MB", author: "D. Okafor", color: "#00e676" },
+      { id: 7, name: "Stone Wall Tileset", type: "Textures", size: "11.3 MB", author: "R. Müller", color: "#8d6e63" },
+      { id: 8, name: "Dragon Rig", type: "3D Models", size: "22.6 MB", author: "K. Tanaka", color: "#7c4dff" },
+    ];
+  },
+
+  getDefaultBuilds() {
+    return [
+      { id: 1, project: "Nebula Frontier", branch: "main", status: "Success", duration: "4m 32s", triggeredBy: "J. Park", timestamp: "2026-02-10 14:23" },
+      { id: 2, project: "Shadowkeep Arena", branch: "release/0.9", status: "Success", duration: "6m 11s", triggeredBy: "CI Bot", timestamp: "2026-02-10 12:05" },
+      { id: 3, project: "Pixel Odyssey", branch: "feature/inventory", status: "Failed", duration: "2m 48s", triggeredBy: "A. Kowalski", timestamp: "2026-02-10 10:17" },
+      { id: 4, project: "Titan Forge", branch: "hotfix/crash", status: "Success", duration: "3m 05s", triggeredBy: "L. Nguyen", timestamp: "2026-02-09 22:44" },
+      { id: 5, project: "Nebula Frontier", branch: "feature/multiplayer", status: "In Progress", duration: "1m 22s", triggeredBy: "S. Chen", timestamp: "2026-02-10 14:50" },
+      { id: 6, project: "Void Runners", branch: "develop", status: "Failed", duration: "5m 09s", triggeredBy: "M. Rivera", timestamp: "2026-02-10 09:30" },
+      { id: 7, project: "Shadowkeep Arena", branch: "main", status: "Success", duration: "5m 55s", triggeredBy: "D. Okafor", timestamp: "2026-02-09 18:12" },
+    ];
+  },
+
+  getDefaultTeamMembers() {
+    return [
+      { id: 1, name: "Jordan Park", email: "j.park@studio.io", role: "Admin", status: "Active", lastLogin: "2026-02-10 14:00", color: "#1e88e5" },
+      { id: 2, name: "Sofia Chen", email: "s.chen@studio.io", role: "Developer", status: "Active", lastLogin: "2026-02-10 13:45", color: "#00c9a7" },
+      { id: 3, name: "Adam Kowalski", email: "a.kowalski@studio.io", role: "Artist", status: "Active", lastLogin: "2026-02-10 11:20", color: "#ffab40" },
+      { id: 4, name: "Mei Rivera", email: "m.rivera@studio.io", role: "QA", status: "Active", lastLogin: "2026-02-09 17:30", color: "#ff5252" },
+      { id: 5, name: "Linh Nguyen", email: "l.nguyen@studio.io", role: "Developer", status: "Inactive", lastLogin: "2025-12-28 09:15", color: "#7c4dff" },
+      { id: 6, name: "David Okafor", email: "d.okafor@studio.io", role: "Viewer", status: "Active", lastLogin: "2026-02-10 08:00", color: "#42a5f5" },
+      { id: 7, name: "Kira Tanaka", email: "k.tanaka@studio.io", role: "Artist", status: "Active", lastLogin: "2026-02-10 12:10", color: "#00e676" },
+    ];
+  },
+
+  getDefaultEvents() {
+    return [
+      { id: 1, name: "Winter Clash 2026", game: "Shadowkeep Arena", start: "2026-02-15", end: "2026-03-15", status: "Upcoming", type: "Seasonal" },
+      { id: 2, name: "Nebula Open Beta", game: "Nebula Frontier", start: "2026-02-20", end: "2026-03-03", status: "Upcoming", type: "Update" },
+      { id: 3, name: "Pixel World Cup", game: "Pixel Odyssey", start: "2026-02-05", end: "2026-02-12", status: "Live", type: "Tournament" },
+      { id: 4, name: "Forge Stability Patch", game: "Titan Forge", start: "2025-12-20", end: "2025-12-20", status: "Ended", type: "Hotfix" },
+      { id: 5, name: "Void Speed Trials", game: "Void Runners", start: "2026-03-01", end: "2026-03-14", status: "Upcoming", type: "Tournament" },
+      { id: 6, name: "Shadow Halloween Event", game: "Shadowkeep Arena", start: "2025-10-20", end: "2025-11-05", status: "Ended", type: "Seasonal" },
+      { id: 7, name: "Nebula v1.2 Rollout", game: "Nebula Frontier", start: "2026-02-10", end: "2026-02-10", status: "Live", type: "Update" },
+    ];
+  },
+
+  getDefaultKPIs() {
+    return [
+      { label: "Daily Active Users", value: "128,430", trend: "up", change: "+12.4%" },
+      { label: "Revenue (MTD)", value: "$1.42M", trend: "up", change: "+8.1%" },
+      { label: "Retention Rate (D7)", value: "41.2%", trend: "down", change: "-2.3%" },
+      { label: "Avg Session Duration", value: "24m 18s", trend: "up", change: "+5.7%" },
+      { label: "New Users (Today)", value: "9,812", trend: "up", change: "+18.6%" },
+      { label: "Conversion Rate", value: "3.8%", trend: "down", change: "-0.4%" },
+    ];
+  }
+};
+
+// Initialize data service on load
+DataService.init();
+
+// ===== Data Access (now using DataService) =====
 
 const assetTypes = ["All", "3D Models", "Textures", "Audio", "Animations", "UI Elements"];
 
-const builds = [
-  { project: "Nebula Frontier", branch: "main", status: "Success", duration: "4m 32s", triggeredBy: "J. Park", timestamp: "2026-02-10 14:23" },
-  { project: "Shadowkeep Arena", branch: "release/0.9", status: "Success", duration: "6m 11s", triggeredBy: "CI Bot", timestamp: "2026-02-10 12:05" },
-  { project: "Pixel Odyssey", branch: "feature/inventory", status: "Failed", duration: "2m 48s", triggeredBy: "A. Kowalski", timestamp: "2026-02-10 10:17" },
-  { project: "Titan Forge", branch: "hotfix/crash", status: "Success", duration: "3m 05s", triggeredBy: "L. Nguyen", timestamp: "2026-02-09 22:44" },
-  { project: "Nebula Frontier", branch: "feature/multiplayer", status: "In Progress", duration: "1m 22s", triggeredBy: "S. Chen", timestamp: "2026-02-10 14:50" },
-  { project: "Void Runners", branch: "develop", status: "Failed", duration: "5m 09s", triggeredBy: "M. Rivera", timestamp: "2026-02-10 09:30" },
-  { project: "Shadowkeep Arena", branch: "main", status: "Success", duration: "5m 55s", triggeredBy: "D. Okafor", timestamp: "2026-02-09 18:12" },
-];
-
-const teamMembers = [
-  { name: "Jordan Park", email: "j.park@studio.io", role: "Admin", status: "Active", lastLogin: "2026-02-10 14:00", color: "#1e88e5" },
-  { name: "Sofia Chen", email: "s.chen@studio.io", role: "Developer", status: "Active", lastLogin: "2026-02-10 13:45", color: "#00c9a7" },
-  { name: "Adam Kowalski", email: "a.kowalski@studio.io", role: "Artist", status: "Active", lastLogin: "2026-02-10 11:20", color: "#ffab40" },
-  { name: "Mei Rivera", email: "m.rivera@studio.io", role: "QA", status: "Active", lastLogin: "2026-02-09 17:30", color: "#ff5252" },
-  { name: "Linh Nguyen", email: "l.nguyen@studio.io", role: "Developer", status: "Inactive", lastLogin: "2025-12-28 09:15", color: "#7c4dff" },
-  { name: "David Okafor", email: "d.okafor@studio.io", role: "Viewer", status: "Active", lastLogin: "2026-02-10 08:00", color: "#42a5f5" },
-  { name: "Kira Tanaka", email: "k.tanaka@studio.io", role: "Artist", status: "Active", lastLogin: "2026-02-10 12:10", color: "#00e676" },
-];
-
-const events = [
-  { name: "Winter Clash 2026", game: "Shadowkeep Arena", start: "2026-02-15", end: "2026-03-15", status: "Upcoming", type: "Seasonal" },
-  { name: "Nebula Open Beta", game: "Nebula Frontier", start: "2026-02-20", end: "2026-03-03", status: "Upcoming", type: "Update" },
-  { name: "Pixel World Cup", game: "Pixel Odyssey", start: "2026-02-05", end: "2026-02-12", status: "Live", type: "Tournament" },
-  { name: "Forge Stability Patch", game: "Titan Forge", start: "2025-12-20", end: "2025-12-20", status: "Ended", type: "Hotfix" },
-  { name: "Void Speed Trials", game: "Void Runners", start: "2026-03-01", end: "2026-03-14", status: "Upcoming", type: "Tournament" },
-  { name: "Shadow Halloween Event", game: "Shadowkeep Arena", start: "2025-10-20", end: "2025-11-05", status: "Ended", type: "Seasonal" },
-  { name: "Nebula v1.2 Rollout", game: "Nebula Frontier", start: "2026-02-10", end: "2026-02-10", status: "Live", type: "Update" },
-];
-
-const kpis = [
-  { label: "Daily Active Users", value: "128,430", trend: "up", change: "+12.4%" },
-  { label: "Revenue (MTD)", value: "$1.42M", trend: "up", change: "+8.1%" },
-  { label: "Retention Rate (D7)", value: "41.2%", trend: "down", change: "-2.3%" },
-  { label: "Avg Session Duration", value: "24m 18s", trend: "up", change: "+5.7%" },
-  { label: "New Users (Today)", value: "9,812", trend: "up", change: "+18.6%" },
-  { label: "Conversion Rate", value: "3.8%", trend: "down", change: "-0.4%" },
-];
+// Helper to get data from service
+let projects = [];
+let assets = [];
+let builds = [];
+let teamMembers = [];
+let events = [];
+let kpis = [];
 
 // ===== Helpers =====
 
@@ -92,7 +356,17 @@ function delay(i) {
 
 // ===== Renderers =====
 
+function refreshData() {
+  projects = DataService.getProjects();
+  assets = DataService.getAssets();
+  builds = DataService.getBuilds();
+  teamMembers = DataService.getTeamMembers();
+  events = DataService.getEvents();
+  kpis = DataService.getKPIs();
+}
+
 function renderProjects() {
+  refreshData();
   const grid = document.getElementById("projectGrid");
   grid.innerHTML = projects.map((p, i) => `
     <div class="card project-card reveal-item" style="${delay(i)}">
@@ -110,6 +384,10 @@ function renderProjects() {
       <div class="progress-label">
         <span>Completion</span>
         <span>${p.completion}%</span>
+      </div>
+      <div class="card-actions">
+        <button class="btn-icon" onclick="editProject(${p.id})" title="Edit Project">✏️</button>
+        <button class="btn-icon" onclick="deleteProject(${p.id})" title="Delete Project">🗑️</button>
       </div>
     </div>
   `).join("");
@@ -129,6 +407,10 @@ function renderAssets(filteredAssets) {
       <div class="asset-info" style="margin-top:6px;">
         <span>by ${a.author}</span>
       </div>
+      <div class="card-actions">
+        <button class="btn-icon" onclick="editAsset(${a.id})" title="Edit Asset">✏️</button>
+        <button class="btn-icon" onclick="deleteAsset(${a.id})" title="Delete Asset">🗑️</button>
+      </div>
     </div>
   `).join("");
 }
@@ -141,6 +423,7 @@ function renderTagFilters() {
 }
 
 function renderBuilds() {
+  refreshData();
   const tbody = document.getElementById("buildsBody");
   tbody.innerHTML = builds.map((b, i) => `
     <tr class="reveal-item" style="${delay(i)}">
@@ -155,6 +438,7 @@ function renderBuilds() {
 }
 
 function renderTeam() {
+  refreshData();
   const tbody = document.getElementById("teamBody");
   tbody.innerHTML = teamMembers.map((m, i) => `
     <tr class="reveal-item" style="${delay(i)}">
@@ -168,11 +452,16 @@ function renderTeam() {
       <td><span class="role-badge ${roleClass(m.role)}">${m.role}</span></td>
       <td><span class="status-dot ${m.status.toLowerCase()}">${m.status}</span></td>
       <td>${m.lastLogin}</td>
+      <td>
+        <button class="btn-icon" onclick="editTeamMember(${m.id})" title="Edit Member">✏️</button>
+        <button class="btn-icon" onclick="deleteTeamMember(${m.id})" title="Delete Member">🗑️</button>
+      </td>
     </tr>
   `).join("");
 }
 
 function renderEvents() {
+  refreshData();
   const grid = document.getElementById("eventsGrid");
   grid.innerHTML = events.map((e, i) => `
     <div class="card event-card reveal-item" style="${delay(i)}">
@@ -185,11 +474,16 @@ function renderEvents() {
       <div class="event-footer">
         <span class="type-badge">${e.type}</span>
       </div>
+      <div class="card-actions">
+        <button class="btn-icon" onclick="editEvent(${e.id})" title="Edit Event">✏️</button>
+        <button class="btn-icon" onclick="deleteEvent(${e.id})" title="Delete Event">🗑️</button>
+      </div>
     </div>
   `).join("");
 }
 
 function renderKPIs() {
+  refreshData();
   const grid = document.getElementById("kpiGrid");
   grid.innerHTML = kpis.map((k, i) => `
     <div class="card kpi-card reveal-item" style="${delay(i)}">
@@ -207,6 +501,7 @@ function renderKPIs() {
 function setupAssetSearch() {
   const input = document.getElementById("assetSearch");
   input.addEventListener("input", () => {
+    refreshData();
     const query = input.value.toLowerCase();
     const activeType = document.querySelector(".tag-btn.active")?.dataset.type || "All";
     const filtered = assets.filter(a => {
@@ -226,6 +521,7 @@ function setupTagFilters() {
     e.target.classList.add("active");
     const type = e.target.dataset.type;
     const query = document.getElementById("assetSearch").value.toLowerCase();
+    refreshData();
     const filtered = assets.filter(a => {
       const matchesType = type === "All" || a.type === type;
       const matchesSearch = a.name.toLowerCase().includes(query) || a.author.toLowerCase().includes(query);
@@ -263,6 +559,263 @@ function setupNavLinks() {
       }
     });
   });
+}
+
+// ===== CRUD Operations =====
+
+// Projects
+function editProject(id) {
+  const project = DataService.getProjects().find(p => p.id === id);
+  if (!project) return;
+  
+  const name = prompt("Project Name:", project.name);
+  if (!name) return;
+  
+  const status = prompt("Status (Active/Beta/Alpha/Maintenance):", project.status);
+  const teamSize = parseInt(prompt("Team Size:", project.teamSize));
+  const completion = parseInt(prompt("Completion %:", project.completion));
+  
+  DataService.updateProject(id, {
+    name,
+    status: status || project.status,
+    teamSize: teamSize || project.teamSize,
+    completion: completion || project.completion,
+    lastUpdated: new Date().toISOString().split('T')[0]
+  });
+  
+  renderProjects();
+}
+
+function deleteProject(id) {
+  if (confirm("Are you sure you want to delete this project?")) {
+    DataService.deleteProject(id);
+    renderProjects();
+  }
+}
+
+function addNewProject() {
+  const name = prompt("Project Name:");
+  if (!name) return;
+  
+  const status = prompt("Status (Active/Beta/Alpha/Maintenance):", "Active");
+  const teamSize = parseInt(prompt("Team Size:", "10"));
+  const completion = parseInt(prompt("Completion %:", "0"));
+  
+  DataService.addProject({
+    name,
+    status: status || "Active",
+    teamSize: teamSize || 10,
+    completion: completion || 0,
+    lastUpdated: new Date().toISOString().split('T')[0]
+  });
+  
+  renderProjects();
+}
+
+// Assets
+function editAsset(id) {
+  const asset = DataService.getAssets().find(a => a.id === id);
+  if (!asset) return;
+  
+  const name = prompt("Asset Name:", asset.name);
+  if (!name) return;
+  
+  const type = prompt("Type (3D Models/Textures/Audio/Animations/UI Elements):", asset.type);
+  const size = prompt("Size (e.g., 10.5 MB):", asset.size);
+  const author = prompt("Author:", asset.author);
+  const color = prompt("Color (hex code):", asset.color);
+  
+  DataService.updateAsset(id, {
+    name,
+    type: type || asset.type,
+    size: size || asset.size,
+    author: author || asset.author,
+    color: color || asset.color
+  });
+  
+  refreshData();
+  renderAssets();
+}
+
+function deleteAsset(id) {
+  if (confirm("Are you sure you want to delete this asset?")) {
+    DataService.deleteAsset(id);
+    refreshData();
+    renderAssets();
+  }
+}
+
+function addNewAsset() {
+  const name = prompt("Asset Name:");
+  if (!name) return;
+  
+  const type = prompt("Type (3D Models/Textures/Audio/Animations/UI Elements):", "3D Models");
+  const size = prompt("Size (e.g., 10.5 MB):", "1.0 MB");
+  const author = prompt("Author:");
+  const color = prompt("Color (hex code):", "#1e88e5");
+  
+  DataService.addAsset({
+    name,
+    type: type || "3D Models",
+    size: size || "1.0 MB",
+    author: author || "Unknown",
+    color: color || "#1e88e5"
+  });
+  
+  refreshData();
+  renderAssets();
+}
+
+// Team Members
+function editTeamMember(id) {
+  const member = DataService.getTeamMembers().find(m => m.id === id);
+  if (!member) return;
+  
+  const name = prompt("Member Name:", member.name);
+  if (!name) return;
+  
+  const email = prompt("Email:", member.email);
+  const role = prompt("Role (Admin/Developer/Artist/QA/Viewer):", member.role);
+  const status = prompt("Status (Active/Inactive):", member.status);
+  const color = prompt("Color (hex code):", member.color);
+  
+  DataService.updateTeamMember(id, {
+    name,
+    email: email || member.email,
+    role: role || member.role,
+    status: status || member.status,
+    color: color || member.color,
+    lastLogin: new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0].slice(0, 5)
+  });
+  
+  renderTeam();
+}
+
+function deleteTeamMember(id) {
+  if (confirm("Are you sure you want to delete this team member?")) {
+    DataService.deleteTeamMember(id);
+    renderTeam();
+  }
+}
+
+function addNewTeamMember() {
+  const name = prompt("Member Name:");
+  if (!name) return;
+  
+  const email = prompt("Email:");
+  const role = prompt("Role (Admin/Developer/Artist/QA/Viewer):", "Developer");
+  const status = prompt("Status (Active/Inactive):", "Active");
+  const color = prompt("Color (hex code):", "#1e88e5");
+  
+  DataService.addTeamMember({
+    name,
+    email: email || "user@studio.io",
+    role: role || "Developer",
+    status: status || "Active",
+    color: color || "#1e88e5",
+    lastLogin: new Date().toISOString().split('T')[0] + ' ' + new Date().toTimeString().split(' ')[0].slice(0, 5)
+  });
+  
+  renderTeam();
+}
+
+// Events
+function editEvent(id) {
+  const event = DataService.getEvents().find(e => e.id === id);
+  if (!event) return;
+  
+  const name = prompt("Event Name:", event.name);
+  if (!name) return;
+  
+  const game = prompt("Game:", event.game);
+  const start = prompt("Start Date (YYYY-MM-DD):", event.start);
+  const end = prompt("End Date (YYYY-MM-DD):", event.end);
+  const status = prompt("Status (Upcoming/Live/Ended):", event.status);
+  const type = prompt("Type (Seasonal/Update/Tournament/Hotfix):", event.type);
+  
+  DataService.updateEvent(id, {
+    name,
+    game: game || event.game,
+    start: start || event.start,
+    end: end || event.end,
+    status: status || event.status,
+    type: type || event.type
+  });
+  
+  renderEvents();
+}
+
+function deleteEvent(id) {
+  if (confirm("Are you sure you want to delete this event?")) {
+    DataService.deleteEvent(id);
+    renderEvents();
+  }
+}
+
+function addNewEvent() {
+  const name = prompt("Event Name:");
+  if (!name) return;
+  
+  const game = prompt("Game:");
+  const start = prompt("Start Date (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
+  const end = prompt("End Date (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
+  const status = prompt("Status (Upcoming/Live/Ended):", "Upcoming");
+  const type = prompt("Type (Seasonal/Update/Tournament/Hotfix):", "Update");
+  
+  DataService.addEvent({
+    name,
+    game: game || "Unknown Game",
+    start: start || new Date().toISOString().split('T')[0],
+    end: end || new Date().toISOString().split('T')[0],
+    status: status || "Upcoming",
+    type: type || "Update"
+  });
+  
+  renderEvents();
+}
+
+// Data Management
+function exportAllData() {
+  const data = DataService.exportData();
+  const dataStr = JSON.stringify(data, null, 2);
+  const dataBlob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(dataBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `dtcc-data-${new Date().toISOString().split('T')[0]}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+  alert("Data exported successfully!");
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        DataService.importData(data);
+        location.reload(); // Refresh page to show imported data
+      } catch (err) {
+        alert("Error importing data: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function resetData() {
+  if (confirm("Are you sure you want to reset all data to defaults? This cannot be undone.")) {
+    DataService.resetToDefaults();
+    location.reload();
+  }
 }
 
 // ===== Init =====
