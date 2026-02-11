@@ -54,7 +54,8 @@ const DataService = {
 
   addProject(project) {
     const projects = this.getProjects();
-    project.id = Date.now();
+    const maxId = projects.length > 0 ? Math.max(...projects.map(p => p.id || 0)) : 0;
+    project.id = maxId + 1;
     projects.push(project);
     this.saveProjects(projects);
     return project;
@@ -88,7 +89,8 @@ const DataService = {
 
   addAsset(asset) {
     const assets = this.getAssets();
-    asset.id = Date.now();
+    const maxId = assets.length > 0 ? Math.max(...assets.map(a => a.id || 0)) : 0;
+    asset.id = maxId + 1;
     assets.push(asset);
     this.saveAssets(assets);
     return asset;
@@ -122,7 +124,8 @@ const DataService = {
 
   addBuild(build) {
     const builds = this.getBuilds();
-    build.id = Date.now();
+    const maxId = builds.length > 0 ? Math.max(...builds.map(b => b.id || 0)) : 0;
+    build.id = maxId + 1;
     builds.unshift(build); // Add to beginning for most recent first
     this.saveBuilds(builds);
     return build;
@@ -139,7 +142,8 @@ const DataService = {
 
   addTeamMember(member) {
     const members = this.getTeamMembers();
-    member.id = Date.now();
+    const maxId = members.length > 0 ? Math.max(...members.map(m => m.id || 0)) : 0;
+    member.id = maxId + 1;
     members.push(member);
     this.saveTeamMembers(members);
     return member;
@@ -173,7 +177,8 @@ const DataService = {
 
   addEvent(event) {
     const events = this.getEvents();
-    event.id = Date.now();
+    const maxId = events.length > 0 ? Math.max(...events.map(e => e.id || 0)) : 0;
+    event.id = maxId + 1;
     events.push(event);
     this.saveEvents(events);
     return event;
@@ -501,7 +506,6 @@ function renderKPIs() {
 function setupAssetSearch() {
   const input = document.getElementById("assetSearch");
   input.addEventListener("input", () => {
-    refreshData();
     const query = input.value.toLowerCase();
     const activeType = document.querySelector(".tag-btn.active")?.dataset.type || "All";
     const filtered = assets.filter(a => {
@@ -521,7 +525,6 @@ function setupTagFilters() {
     e.target.classList.add("active");
     const type = e.target.dataset.type;
     const query = document.getElementById("assetSearch").value.toLowerCase();
-    refreshData();
     const filtered = assets.filter(a => {
       const matchesType = type === "All" || a.type === type;
       const matchesSearch = a.name.toLowerCase().includes(query) || a.author.toLowerCase().includes(query);
@@ -633,14 +636,14 @@ function editAsset(id) {
     color: color || asset.color
   });
   
-  refreshData();
+  assets = DataService.getAssets();
   renderAssets();
 }
 
 function deleteAsset(id) {
   if (confirm("Are you sure you want to delete this asset?")) {
     DataService.deleteAsset(id);
-    refreshData();
+    assets = DataService.getAssets();
     renderAssets();
   }
 }
@@ -662,7 +665,7 @@ function addNewAsset() {
     color: color || "#1e88e5"
   });
   
-  refreshData();
+  assets = DataService.getAssets();
   renderAssets();
 }
 
@@ -801,7 +804,14 @@ function importData() {
       try {
         const data = JSON.parse(event.target.result);
         DataService.importData(data);
-        location.reload(); // Refresh page to show imported data
+        // Re-render all sections instead of reloading
+        renderProjects();
+        renderAssets();
+        renderBuilds();
+        renderTeam();
+        renderEvents();
+        renderKPIs();
+        alert("Data imported successfully!");
       } catch (err) {
         alert("Error importing data: " + err.message);
       }
@@ -814,7 +824,14 @@ function importData() {
 function resetData() {
   if (confirm("Are you sure you want to reset all data to defaults? This cannot be undone.")) {
     DataService.resetToDefaults();
-    location.reload();
+    // Re-render all sections instead of reloading
+    renderProjects();
+    renderAssets();
+    renderBuilds();
+    renderTeam();
+    renderEvents();
+    renderKPIs();
+    alert("Data reset to defaults successfully!");
   }
 }
 
