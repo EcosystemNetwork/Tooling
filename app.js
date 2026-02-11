@@ -1,11 +1,11 @@
 // ===== Mock Data =====
 
 const projects = [
-  { name: "Nebula Frontier", status: "Active", teamSize: 24, lastUpdated: "2025-01-10", completion: 78 },
-  { name: "Shadowkeep Arena", status: "Beta", teamSize: 18, lastUpdated: "2025-01-08", completion: 92 },
-  { name: "Pixel Odyssey", status: "Alpha", teamSize: 12, lastUpdated: "2025-01-06", completion: 45 },
-  { name: "Titan Forge", status: "Maintenance", teamSize: 8, lastUpdated: "2024-12-20", completion: 100 },
-  { name: "Void Runners", status: "Active", teamSize: 20, lastUpdated: "2025-01-09", completion: 62 },
+  { name: "Nebula Frontier", status: "Active", teamSize: 24, lastUpdated: "2026-02-10", completion: 78 },
+  { name: "Shadowkeep Arena", status: "Beta", teamSize: 18, lastUpdated: "2026-02-08", completion: 92 },
+  { name: "Pixel Odyssey", status: "Alpha", teamSize: 12, lastUpdated: "2026-02-06", completion: 45 },
+  { name: "Titan Forge", status: "Maintenance", teamSize: 8, lastUpdated: "2025-12-20", completion: 100 },
+  { name: "Void Runners", status: "Active", teamSize: 20, lastUpdated: "2026-02-09", completion: 62 },
 ];
 
 const assets = [
@@ -22,33 +22,33 @@ const assets = [
 const assetTypes = ["All", "3D Models", "Textures", "Audio", "Animations", "UI Elements"];
 
 const builds = [
-  { project: "Nebula Frontier", branch: "main", status: "Success", duration: "4m 32s", triggeredBy: "J. Park", timestamp: "2025-01-10 14:23" },
-  { project: "Shadowkeep Arena", branch: "release/0.9", status: "Success", duration: "6m 11s", triggeredBy: "CI Bot", timestamp: "2025-01-10 12:05" },
-  { project: "Pixel Odyssey", branch: "feature/inventory", status: "Failed", duration: "2m 48s", triggeredBy: "A. Kowalski", timestamp: "2025-01-10 10:17" },
-  { project: "Titan Forge", branch: "hotfix/crash", status: "Success", duration: "3m 05s", triggeredBy: "L. Nguyen", timestamp: "2025-01-09 22:44" },
-  { project: "Nebula Frontier", branch: "feature/multiplayer", status: "In Progress", duration: "1m 22s", triggeredBy: "S. Chen", timestamp: "2025-01-10 14:50" },
-  { project: "Void Runners", branch: "develop", status: "Failed", duration: "5m 09s", triggeredBy: "M. Rivera", timestamp: "2025-01-10 09:30" },
-  { project: "Shadowkeep Arena", branch: "main", status: "Success", duration: "5m 55s", triggeredBy: "D. Okafor", timestamp: "2025-01-09 18:12" },
+  { project: "Nebula Frontier", branch: "main", status: "Success", duration: "4m 32s", triggeredBy: "J. Park", timestamp: "2026-02-10 14:23" },
+  { project: "Shadowkeep Arena", branch: "release/0.9", status: "Success", duration: "6m 11s", triggeredBy: "CI Bot", timestamp: "2026-02-10 12:05" },
+  { project: "Pixel Odyssey", branch: "feature/inventory", status: "Failed", duration: "2m 48s", triggeredBy: "A. Kowalski", timestamp: "2026-02-10 10:17" },
+  { project: "Titan Forge", branch: "hotfix/crash", status: "Success", duration: "3m 05s", triggeredBy: "L. Nguyen", timestamp: "2026-02-09 22:44" },
+  { project: "Nebula Frontier", branch: "feature/multiplayer", status: "In Progress", duration: "1m 22s", triggeredBy: "S. Chen", timestamp: "2026-02-10 14:50" },
+  { project: "Void Runners", branch: "develop", status: "Failed", duration: "5m 09s", triggeredBy: "M. Rivera", timestamp: "2026-02-10 09:30" },
+  { project: "Shadowkeep Arena", branch: "main", status: "Success", duration: "5m 55s", triggeredBy: "D. Okafor", timestamp: "2026-02-09 18:12" },
 ];
 
 const teamMembers = [
-  { name: "Jordan Park", email: "j.park@studio.io", role: "Admin", status: "Active", lastLogin: "2025-01-10 14:00", color: "#1e88e5" },
-  { name: "Sofia Chen", email: "s.chen@studio.io", role: "Developer", status: "Active", lastLogin: "2025-01-10 13:45", color: "#00c9a7" },
-  { name: "Adam Kowalski", email: "a.kowalski@studio.io", role: "Artist", status: "Active", lastLogin: "2025-01-10 11:20", color: "#ffab40" },
-  { name: "Mei Rivera", email: "m.rivera@studio.io", role: "QA", status: "Active", lastLogin: "2025-01-09 17:30", color: "#ff5252" },
-  { name: "Linh Nguyen", email: "l.nguyen@studio.io", role: "Developer", status: "Inactive", lastLogin: "2024-12-28 09:15", color: "#7c4dff" },
-  { name: "David Okafor", email: "d.okafor@studio.io", role: "Viewer", status: "Active", lastLogin: "2025-01-10 08:00", color: "#42a5f5" },
-  { name: "Kira Tanaka", email: "k.tanaka@studio.io", role: "Artist", status: "Active", lastLogin: "2025-01-10 12:10", color: "#00e676" },
+  { name: "Jordan Park", email: "j.park@studio.io", role: "Admin", status: "Active", lastLogin: "2026-02-10 14:00", color: "#1e88e5" },
+  { name: "Sofia Chen", email: "s.chen@studio.io", role: "Developer", status: "Active", lastLogin: "2026-02-10 13:45", color: "#00c9a7" },
+  { name: "Adam Kowalski", email: "a.kowalski@studio.io", role: "Artist", status: "Active", lastLogin: "2026-02-10 11:20", color: "#ffab40" },
+  { name: "Mei Rivera", email: "m.rivera@studio.io", role: "QA", status: "Active", lastLogin: "2026-02-09 17:30", color: "#ff5252" },
+  { name: "Linh Nguyen", email: "l.nguyen@studio.io", role: "Developer", status: "Inactive", lastLogin: "2025-12-28 09:15", color: "#7c4dff" },
+  { name: "David Okafor", email: "d.okafor@studio.io", role: "Viewer", status: "Active", lastLogin: "2026-02-10 08:00", color: "#42a5f5" },
+  { name: "Kira Tanaka", email: "k.tanaka@studio.io", role: "Artist", status: "Active", lastLogin: "2026-02-10 12:10", color: "#00e676" },
 ];
 
 const events = [
-  { name: "Winter Clash 2025", game: "Shadowkeep Arena", start: "2025-01-15", end: "2025-02-15", status: "Upcoming", type: "Seasonal" },
-  { name: "Nebula Open Beta", game: "Nebula Frontier", start: "2025-01-20", end: "2025-02-03", status: "Upcoming", type: "Update" },
-  { name: "Pixel World Cup", game: "Pixel Odyssey", start: "2025-01-05", end: "2025-01-12", status: "Live", type: "Tournament" },
-  { name: "Forge Stability Patch", game: "Titan Forge", start: "2024-12-20", end: "2024-12-20", status: "Ended", type: "Hotfix" },
-  { name: "Void Speed Trials", game: "Void Runners", start: "2025-02-01", end: "2025-02-14", status: "Upcoming", type: "Tournament" },
-  { name: "Shadow Halloween Event", game: "Shadowkeep Arena", start: "2024-10-20", end: "2024-11-05", status: "Ended", type: "Seasonal" },
-  { name: "Nebula v1.2 Rollout", game: "Nebula Frontier", start: "2025-01-10", end: "2025-01-10", status: "Live", type: "Update" },
+  { name: "Winter Clash 2026", game: "Shadowkeep Arena", start: "2026-02-15", end: "2026-03-15", status: "Upcoming", type: "Seasonal" },
+  { name: "Nebula Open Beta", game: "Nebula Frontier", start: "2026-02-20", end: "2026-03-03", status: "Upcoming", type: "Update" },
+  { name: "Pixel World Cup", game: "Pixel Odyssey", start: "2026-02-05", end: "2026-02-12", status: "Live", type: "Tournament" },
+  { name: "Forge Stability Patch", game: "Titan Forge", start: "2025-12-20", end: "2025-12-20", status: "Ended", type: "Hotfix" },
+  { name: "Void Speed Trials", game: "Void Runners", start: "2026-03-01", end: "2026-03-14", status: "Upcoming", type: "Tournament" },
+  { name: "Shadow Halloween Event", game: "Shadowkeep Arena", start: "2025-10-20", end: "2025-11-05", status: "Ended", type: "Seasonal" },
+  { name: "Nebula v1.2 Rollout", game: "Nebula Frontier", start: "2026-02-10", end: "2026-02-10", status: "Live", type: "Update" },
 ];
 
 const kpis = [
