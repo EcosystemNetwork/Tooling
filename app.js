@@ -229,7 +229,8 @@ const DataService = {
 
   addKPI(kpi) {
     const kpis = this.getKPIs();
-    const maxId = kpis.length > 0 ? Math.max(...kpis.map(k => k.id || 0)) : 0;
+    const idsWithValues = kpis.filter(k => k.id).map(k => k.id);
+    const maxId = idsWithValues.length > 0 ? Math.max(...idsWithValues) : 0;
     kpi.id = maxId + 1;
     kpis.push(kpi);
     this.saveKPIs(kpis);
