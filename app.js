@@ -618,11 +618,18 @@ function setupNavLinks() {
 
 // ===== Modal & Toast System =====
 
+function escapeHTML(str) {
+  var div = document.createElement("div");
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+}
+
 function showToast(message, type) {
   type = type || "success";
   var container = document.getElementById("toastContainer");
   var toast = document.createElement("div");
   toast.className = "toast toast-" + type;
+  toast.setAttribute("role", "status");
   var icons = { success: "✅", error: "❌", info: "ℹ️" };
   toast.textContent = (icons[type] || "") + " " + message;
   container.appendChild(toast);
@@ -660,7 +667,10 @@ function openModal(title, bodyHTML, onConfirm, confirmLabel, confirmClass) {
   }
 
   function handleConfirm() {
-    if (onConfirm) onConfirm();
+    if (onConfirm) {
+      var result = onConfirm();
+      if (result === false) return;
+    }
     cleanup();
   }
 
@@ -686,7 +696,8 @@ function confirmModal(message, onConfirm) {
 
 function selectOptions(options, selected) {
   return options.map(function(opt) {
-    return '<option value="' + opt + '"' + (opt === selected ? ' selected' : '') + '>' + opt + '</option>';
+    var escaped = escapeHTML(opt);
+    return '<option value="' + escaped + '"' + (opt === selected ? ' selected' : '') + '>' + escaped + '</option>';
   }).join("");
 }
 
@@ -698,7 +709,7 @@ function projectFormHTML(p) {
   return '' +
     '<div class="form-group">' +
       '<label class="form-label">Project Name</label>' +
-      '<input class="form-input" id="f-name" type="text" value="' + (p.name || '') + '" placeholder="Enter project name">' +
+      '<input class="form-input" id="f-name" type="text" value="' + escapeHTML(p.name || '') + '" placeholder="Enter project name">' +
     '</div>' +
     '<div class="form-row">' +
       '<div class="form-group">' +
@@ -707,12 +718,12 @@ function projectFormHTML(p) {
       '</div>' +
       '<div class="form-group">' +
         '<label class="form-label">Team Size</label>' +
-        '<input class="form-input" id="f-teamSize" type="number" min="1" value="' + (p.teamSize || 10) + '">' +
+        '<input class="form-input" id="f-teamSize" type="number" min="1" value="' + escapeHTML(String(p.teamSize || 10)) + '">' +
       '</div>' +
     '</div>' +
     '<div class="form-group">' +
       '<label class="form-label">Completion %</label>' +
-      '<input class="form-input" id="f-completion" type="number" min="0" max="100" value="' + (p.completion || 0) + '">' +
+      '<input class="form-input" id="f-completion" type="number" min="0" max="100" value="' + escapeHTML(String(p.completion || 0)) + '">' +
     '</div>';
 }
 
@@ -721,7 +732,7 @@ function editProject(id) {
   if (!project) return;
   openModal("Edit Project", projectFormHTML(project), function() {
     var name = document.getElementById("f-name").value.trim();
-    if (!name) return;
+    if (!name) { showToast("Name is required", "error"); return false; }
     DataService.updateProject(id, {
       name: name,
       status: document.getElementById("f-status").value,
@@ -745,7 +756,7 @@ function deleteProject(id) {
 function addNewProject() {
   openModal("Add Project", projectFormHTML(), function() {
     var name = document.getElementById("f-name").value.trim();
-    if (!name) return;
+    if (!name) { showToast("Name is required", "error"); return false; }
     DataService.addProject({
       name: name,
       status: document.getElementById("f-status").value,
@@ -764,7 +775,7 @@ function assetFormHTML(a) {
   return '' +
     '<div class="form-group">' +
       '<label class="form-label">Asset Name</label>' +
-      '<input class="form-input" id="f-name" type="text" value="' + (a.name || '') + '" placeholder="Enter asset name">' +
+      '<input class="form-input" id="f-name" type="text" value="' + escapeHTML(a.name || '') + '" placeholder="Enter asset name">' +
     '</div>' +
     '<div class="form-row">' +
       '<div class="form-group">' +
@@ -773,17 +784,17 @@ function assetFormHTML(a) {
       '</div>' +
       '<div class="form-group">' +
         '<label class="form-label">Size</label>' +
-        '<input class="form-input" id="f-size" type="text" value="' + (a.size || '1.0 MB') + '" placeholder="e.g., 10.5 MB">' +
+        '<input class="form-input" id="f-size" type="text" value="' + escapeHTML(a.size || '1.0 MB') + '" placeholder="e.g., 10.5 MB">' +
       '</div>' +
     '</div>' +
     '<div class="form-row">' +
       '<div class="form-group">' +
         '<label class="form-label">Author</label>' +
-        '<input class="form-input" id="f-author" type="text" value="' + (a.author || '') + '" placeholder="Author name">' +
+        '<input class="form-input" id="f-author" type="text" value="' + escapeHTML(a.author || '') + '" placeholder="Author name">' +
       '</div>' +
       '<div class="form-group">' +
         '<label class="form-label">Color</label>' +
-        '<input class="form-input" id="f-color" type="color" value="' + (a.color || '#1e88e5') + '">' +
+        '<input class="form-input" id="f-color" type="color" value="' + escapeHTML(a.color || '#1e88e5') + '">' +
       '</div>' +
     '</div>';
 }
@@ -793,7 +804,7 @@ function editAsset(id) {
   if (!asset) return;
   openModal("Edit Asset", assetFormHTML(asset), function() {
     var name = document.getElementById("f-name").value.trim();
-    if (!name) return;
+    if (!name) { showToast("Name is required", "error"); return false; }
     DataService.updateAsset(id, {
       name: name,
       type: document.getElementById("f-type").value,
@@ -819,7 +830,7 @@ function deleteAsset(id) {
 function addNewAsset() {
   openModal("Add Asset", assetFormHTML(), function() {
     var name = document.getElementById("f-name").value.trim();
-    if (!name) return;
+    if (!name) { showToast("Name is required", "error"); return false; }
     DataService.addAsset({
       name: name,
       type: document.getElementById("f-type").value,
@@ -840,11 +851,11 @@ function teamFormHTML(m) {
     '<div class="form-row">' +
       '<div class="form-group">' +
         '<label class="form-label">Name</label>' +
-        '<input class="form-input" id="f-name" type="text" value="' + (m.name || '') + '" placeholder="Full name">' +
+        '<input class="form-input" id="f-name" type="text" value="' + escapeHTML(m.name || '') + '" placeholder="Full name">' +
       '</div>' +
       '<div class="form-group">' +
         '<label class="form-label">Email</label>' +
-        '<input class="form-input" id="f-email" type="email" value="' + (m.email || '') + '" placeholder="email@example.com">' +
+        '<input class="form-input" id="f-email" type="email" value="' + escapeHTML(m.email || '') + '" placeholder="email@example.com">' +
       '</div>' +
     '</div>' +
     '<div class="form-row">' +
@@ -859,7 +870,7 @@ function teamFormHTML(m) {
     '</div>' +
     '<div class="form-group">' +
       '<label class="form-label">Avatar Color</label>' +
-      '<input class="form-input" id="f-color" type="color" value="' + (m.color || '#1e88e5') + '">' +
+      '<input class="form-input" id="f-color" type="color" value="' + escapeHTML(m.color || '#1e88e5') + '">' +
     '</div>';
 }
 
@@ -868,7 +879,7 @@ function editTeamMember(id) {
   if (!member) return;
   openModal("Edit Team Member", teamFormHTML(member), function() {
     var name = document.getElementById("f-name").value.trim();
-    if (!name) return;
+    if (!name) { showToast("Name is required", "error"); return false; }
     DataService.updateTeamMember(id, {
       name: name,
       email: document.getElementById("f-email").value || member.email,
@@ -893,7 +904,7 @@ function deleteTeamMember(id) {
 function addNewTeamMember() {
   openModal("Add Team Member", teamFormHTML(), function() {
     var name = document.getElementById("f-name").value.trim();
-    if (!name) return;
+    if (!name) { showToast("Name is required", "error"); return false; }
     DataService.addTeamMember({
       name: name,
       email: document.getElementById("f-email").value || "user@studio.io",
@@ -914,20 +925,20 @@ function eventFormHTML(e) {
   return '' +
     '<div class="form-group">' +
       '<label class="form-label">Event Name</label>' +
-      '<input class="form-input" id="f-name" type="text" value="' + (e.name || '') + '" placeholder="Enter event name">' +
+      '<input class="form-input" id="f-name" type="text" value="' + escapeHTML(e.name || '') + '" placeholder="Enter event name">' +
     '</div>' +
     '<div class="form-group">' +
       '<label class="form-label">Game</label>' +
-      '<input class="form-input" id="f-game" type="text" value="' + (e.game || '') + '" placeholder="Game title">' +
+      '<input class="form-input" id="f-game" type="text" value="' + escapeHTML(e.game || '') + '" placeholder="Game title">' +
     '</div>' +
     '<div class="form-row">' +
       '<div class="form-group">' +
         '<label class="form-label">Start Date</label>' +
-        '<input class="form-input" id="f-start" type="date" value="' + (e.start || today) + '">' +
+        '<input class="form-input" id="f-start" type="date" value="' + escapeHTML(e.start || today) + '">' +
       '</div>' +
       '<div class="form-group">' +
         '<label class="form-label">End Date</label>' +
-        '<input class="form-input" id="f-end" type="date" value="' + (e.end || today) + '">' +
+        '<input class="form-input" id="f-end" type="date" value="' + escapeHTML(e.end || today) + '">' +
       '</div>' +
     '</div>' +
     '<div class="form-row">' +
@@ -947,7 +958,7 @@ function editEvent(id) {
   if (!event) return;
   openModal("Edit Event", eventFormHTML(event), function() {
     var name = document.getElementById("f-name").value.trim();
-    if (!name) return;
+    if (!name) { showToast("Name is required", "error"); return false; }
     DataService.updateEvent(id, {
       name: name,
       game: document.getElementById("f-game").value || event.game,
@@ -972,7 +983,7 @@ function deleteEvent(id) {
 function addNewEvent() {
   openModal("Add Event", eventFormHTML(), function() {
     var name = document.getElementById("f-name").value.trim();
-    if (!name) return;
+    if (!name) { showToast("Name is required", "error"); return false; }
     DataService.addEvent({
       name: name,
       game: document.getElementById("f-game").value || "Unknown Game",
@@ -993,11 +1004,11 @@ function buildFormHTML(b) {
     '<div class="form-row">' +
       '<div class="form-group">' +
         '<label class="form-label">Project</label>' +
-        '<input class="form-input" id="f-project" type="text" value="' + (b.project || '') + '" placeholder="Project name">' +
+        '<input class="form-input" id="f-project" type="text" value="' + escapeHTML(b.project || '') + '" placeholder="Project name">' +
       '</div>' +
       '<div class="form-group">' +
         '<label class="form-label">Branch</label>' +
-        '<input class="form-input" id="f-branch" type="text" value="' + (b.branch || 'main') + '" placeholder="e.g., main">' +
+        '<input class="form-input" id="f-branch" type="text" value="' + escapeHTML(b.branch || 'main') + '" placeholder="e.g., main">' +
       '</div>' +
     '</div>' +
     '<div class="form-row">' +
@@ -1007,12 +1018,12 @@ function buildFormHTML(b) {
       '</div>' +
       '<div class="form-group">' +
         '<label class="form-label">Duration</label>' +
-        '<input class="form-input" id="f-duration" type="text" value="' + (b.duration || '0m 00s') + '" placeholder="e.g., 4m 32s">' +
+        '<input class="form-input" id="f-duration" type="text" value="' + escapeHTML(b.duration || '0m 00s') + '" placeholder="e.g., 4m 32s">' +
       '</div>' +
     '</div>' +
     '<div class="form-group">' +
       '<label class="form-label">Triggered By</label>' +
-      '<input class="form-input" id="f-triggeredBy" type="text" value="' + (b.triggeredBy || '') + '" placeholder="Who triggered this build">' +
+      '<input class="form-input" id="f-triggeredBy" type="text" value="' + escapeHTML(b.triggeredBy || '') + '" placeholder="Who triggered this build">' +
     '</div>';
 }
 
@@ -1021,7 +1032,7 @@ function editBuild(id) {
   if (!build) return;
   openModal("Edit Build", buildFormHTML(build), function() {
     var project = document.getElementById("f-project").value.trim();
-    if (!project) return;
+    if (!project) { showToast("Project name is required", "error"); return false; }
     DataService.updateBuild(id, {
       project: project,
       branch: document.getElementById("f-branch").value || build.branch,
@@ -1046,7 +1057,7 @@ function deleteBuild(id) {
 function addNewBuild() {
   openModal("Add Build", buildFormHTML(), function() {
     var project = document.getElementById("f-project").value.trim();
-    if (!project) return;
+    if (!project) { showToast("Project name is required", "error"); return false; }
     var now = new Date();
     var timestamp = now.toISOString().split('T')[0] + ' ' + now.toTimeString().split(' ')[0].slice(0, 5);
     DataService.addBuild({
@@ -1068,11 +1079,11 @@ function kpiFormHTML(k) {
   return '' +
     '<div class="form-group">' +
       '<label class="form-label">KPI Label</label>' +
-      '<input class="form-input" id="f-label" type="text" value="' + (k.label || '') + '" placeholder="e.g., Daily Active Users">' +
+      '<input class="form-input" id="f-label" type="text" value="' + escapeHTML(k.label || '') + '" placeholder="e.g., Daily Active Users">' +
     '</div>' +
     '<div class="form-group">' +
       '<label class="form-label">Value</label>' +
-      '<input class="form-input" id="f-value" type="text" value="' + (k.value || '0') + '" placeholder="e.g., 128,430">' +
+      '<input class="form-input" id="f-value" type="text" value="' + escapeHTML(k.value || '0') + '" placeholder="e.g., 128,430">' +
     '</div>' +
     '<div class="form-row">' +
       '<div class="form-group">' +
@@ -1081,7 +1092,7 @@ function kpiFormHTML(k) {
       '</div>' +
       '<div class="form-group">' +
         '<label class="form-label">Change</label>' +
-        '<input class="form-input" id="f-change" type="text" value="' + (k.change || '+0.0%') + '" placeholder="e.g., +12.4%">' +
+        '<input class="form-input" id="f-change" type="text" value="' + escapeHTML(k.change || '+0.0%') + '" placeholder="e.g., +12.4%">' +
       '</div>' +
     '</div>';
 }
@@ -1091,7 +1102,7 @@ function editKPI(id) {
   if (!kpi) return;
   openModal("Edit KPI", kpiFormHTML(kpi), function() {
     var label = document.getElementById("f-label").value.trim();
-    if (!label) return;
+    if (!label) { showToast("Label is required", "error"); return false; }
     DataService.updateKPI(id, {
       label: label,
       value: document.getElementById("f-value").value || kpi.value,
@@ -1114,7 +1125,7 @@ function deleteKPI(id) {
 function addNewKPI() {
   openModal("Add KPI", kpiFormHTML(), function() {
     var label = document.getElementById("f-label").value.trim();
-    if (!label) return;
+    if (!label) { showToast("Label is required", "error"); return false; }
     DataService.addKPI({
       label: label,
       value: document.getElementById("f-value").value || "0",
