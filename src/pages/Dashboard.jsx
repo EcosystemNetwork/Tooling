@@ -26,14 +26,14 @@ export default function Dashboard() {
 
   const openAdd = () => {
     setEditingId(null);
-    setForm({ name: '', description: '', repoUrl: '', status: 'Active', teamSize: 10, completion: 0 });
+    setForm({ name: '', description: '', repoUrl: '', status: 'Active', engine: 'Three.js', teamSize: 10, completion: 0 });
     setErrors({});
     setModalOpen(true);
   };
 
   const openEdit = (p) => {
     setEditingId(p.id);
-    setForm({ name: p.name, description: p.description || '', repoUrl: p.repoUrl || '', status: p.status, teamSize: p.teamSize, completion: p.completion });
+    setForm({ name: p.name, description: p.description || '', repoUrl: p.repoUrl || '', status: p.status, engine: p.engine || 'Three.js', teamSize: p.teamSize, completion: p.completion });
     setErrors({});
     setModalOpen(true);
   };
@@ -53,6 +53,7 @@ export default function Dashboard() {
       description: form.description.trim(),
       repoUrl: form.repoUrl.trim(),
       status: form.status,
+      engine: form.engine,
       teamSize: parseInt(form.teamSize) || 10,
       completion: parseInt(form.completion) || 0,
       lastUpdated: new Date().toISOString().split('T')[0]
@@ -97,6 +98,7 @@ export default function Dashboard() {
             <div className="project-meta">
               <span>👥 {p.teamSize} members</span>
               <span>🕐 {p.lastUpdated}</span>
+              {p.engine && <span>🎮 {p.engine}</span>}
             </div>
             {p.repoUrl && (
               <div className="project-repo">
@@ -140,6 +142,14 @@ export default function Dashboard() {
               {['Active', 'Beta', 'Alpha', 'Maintenance'].map(o => <option key={o} value={o}>{o}</option>)}
             </select>
           </div>
+          <div className="form-group">
+            <label className="form-label">Engine</label>
+            <select className="form-select" value={form.engine || 'Three.js'} onChange={e => setForm(f => ({ ...f, engine: e.target.value }))}>
+              {['Three.js', 'Babylon.js'].map(o => <option key={o} value={o}>{o}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="form-row">
           <div className="form-group">
             <label className="form-label">Team Size</label>
             <input className="form-input" type="number" min="1" value={form.teamSize || 10} onChange={e => setForm(f => ({ ...f, teamSize: e.target.value }))} />

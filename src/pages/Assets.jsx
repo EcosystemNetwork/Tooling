@@ -3,7 +3,7 @@ import DataService from '../services/DataService';
 import Modal from '../components/Modal';
 import { useToast } from '../components/Toast';
 
-const assetTypes = ['All', '3D Models', 'Textures', 'Audio', 'Animations', 'UI Elements'];
+const assetTypes = ['All', '3D Models', 'Textures', 'Audio', 'Animations', 'UI Elements', 'Materials', 'Shaders', 'Prefabs', 'Skyboxes'];
 
 export default function Assets() {
   const [assets, setAssets] = useState(() => DataService.getAssets());
@@ -112,7 +112,7 @@ export default function Assets() {
           <div className="form-group">
             <label className="form-label">Type</label>
             <select className="form-select" value={form.type || '3D Models'} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}>
-              {['3D Models', 'Textures', 'Audio', 'Animations', 'UI Elements'].map(o => <option key={o} value={o}>{o}</option>)}
+              {['3D Models', 'Textures', 'Audio', 'Animations', 'UI Elements', 'Materials', 'Shaders', 'Prefabs', 'Skyboxes'].map(o => <option key={o} value={o}>{o}</option>)}
             </select>
           </div>
           <div className="form-group">
