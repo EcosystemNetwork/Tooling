@@ -289,11 +289,11 @@ const DataService = {
   // Default data sets
   getDefaultProjects() {
     return [
-      { id: 1, name: "Nebula Frontier", status: "Active", teamSize: 24, lastUpdated: "2026-02-10", completion: 78 },
-      { id: 2, name: "Shadowkeep Arena", status: "Beta", teamSize: 18, lastUpdated: "2026-02-08", completion: 92 },
-      { id: 3, name: "Pixel Odyssey", status: "Alpha", teamSize: 12, lastUpdated: "2026-02-06", completion: 45 },
-      { id: 4, name: "Titan Forge", status: "Maintenance", teamSize: 8, lastUpdated: "2025-12-20", completion: 100 },
-      { id: 5, name: "Void Runners", status: "Active", teamSize: 20, lastUpdated: "2026-02-09", completion: 62 },
+      { id: 1, name: "Nebula Frontier", status: "Active", teamSize: 24, lastUpdated: "2026-02-10", completion: 78, description: "Open-world space exploration game with procedural generation and multiplayer combat.", repoUrl: "https://github.com/studio/nebula-frontier" },
+      { id: 2, name: "Shadowkeep Arena", status: "Beta", teamSize: 18, lastUpdated: "2026-02-08", completion: 92, description: "Competitive PvP arena shooter with ranked matchmaking and seasonal content.", repoUrl: "https://github.com/studio/shadowkeep-arena" },
+      { id: 3, name: "Pixel Odyssey", status: "Alpha", teamSize: 12, lastUpdated: "2026-02-06", completion: 45, description: "Retro-inspired platformer with roguelike elements and pixel art graphics.", repoUrl: "https://github.com/studio/pixel-odyssey" },
+      { id: 4, name: "Titan Forge", status: "Maintenance", teamSize: 8, lastUpdated: "2025-12-20", completion: 100, description: "Crafting and building simulation game in maintenance mode.", repoUrl: "" },
+      { id: 5, name: "Void Runners", status: "Active", teamSize: 20, lastUpdated: "2026-02-09", completion: 62, description: "Fast-paced racing game set in zero-gravity environments.", repoUrl: "https://github.com/studio/void-runners" },
     ];
   },
 
@@ -420,13 +420,15 @@ function renderProjects() {
   grid.innerHTML = projects.map((p, i) => `
     <div class="card project-card reveal-item" style="${delay(i)}">
       <div class="project-header">
-        <div class="project-name">${p.name}</div>
-        <span class="badge ${statusBadgeClass(p.status)}">${p.status}</span>
+        <div class="project-name">${escapeHTML(p.name)}</div>
+        <span class="badge ${statusBadgeClass(p.status)}">${escapeHTML(p.status)}</span>
       </div>
+      ${p.description ? '<div class="project-description">' + escapeHTML(p.description) + '</div>' : ''}
       <div class="project-meta">
         <span>👥 ${p.teamSize} members</span>
         <span>🕐 ${p.lastUpdated}</span>
       </div>
+      ${p.repoUrl ? '<div class="project-repo"><a href="' + escapeHTML(p.repoUrl) + '" target="_blank" rel="noopener noreferrer">🔗 Repository</a></div>' : ''}
       <div class="progress-bar-wrapper">
         <div class="progress-bar-fill" style="width: ${p.completion}%"></div>
       </div>
@@ -664,6 +666,7 @@ function openModal(title, bodyHTML, onConfirm, confirmLabel, confirmClass) {
     cancelBtn.removeEventListener("click", cleanup);
     closeBtn.removeEventListener("click", cleanup);
     overlay.removeEventListener("click", handleOverlayClick);
+    document.removeEventListener("keydown", handleKeyDown);
   }
 
   function handleConfirm() {
@@ -678,10 +681,19 @@ function openModal(title, bodyHTML, onConfirm, confirmLabel, confirmClass) {
     if (e.target === overlay) cleanup();
   }
 
+  function handleKeyDown(e) {
+    if (e.key === "Escape") { cleanup(); return; }
+    if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") {
+      e.preventDefault();
+      handleConfirm();
+    }
+  }
+
   confirmBtn.addEventListener("click", handleConfirm);
   cancelBtn.addEventListener("click", cleanup);
   closeBtn.addEventListener("click", cleanup);
   overlay.addEventListener("click", handleOverlayClick);
+  document.addEventListener("keydown", handleKeyDown);
 }
 
 function confirmModal(message, onConfirm) {
@@ -706,10 +718,21 @@ function selectOptions(options, selected) {
 // Projects
 function projectFormHTML(p) {
   p = p || {};
+  var completionVal = p.completion != null ? p.completion : 0;
   return '' +
     '<div class="form-group">' +
-      '<label class="form-label">Project Name</label>' +
-      '<input class="form-input" id="f-name" type="text" value="' + escapeHTML(p.name || '') + '" placeholder="Enter project name">' +
+      '<label class="form-label">Project Name <span class="form-required">*</span></label>' +
+      '<input class="form-input" id="f-name" type="text" value="' + escapeHTML(p.name || '') + '" placeholder="Enter project name" required>' +
+      '<span class="form-error" id="f-name-error">Project name is required</span>' +
+    '</div>' +
+    '<div class="form-group">' +
+      '<label class="form-label">Description</label>' +
+      '<textarea class="form-input form-textarea" id="f-description" rows="3" placeholder="Describe the project goals, tech stack, or key details...">' + escapeHTML(p.description || '') + '</textarea>' +
+    '</div>' +
+    '<div class="form-group">' +
+      '<label class="form-label">Repository URL</label>' +
+      '<input class="form-input" id="f-repoUrl" type="url" value="' + escapeHTML(p.repoUrl || '') + '" placeholder="https://github.com/org/repo">' +
+      '<span class="form-error" id="f-repoUrl-error">Please enter a valid URL</span>' +
     '</div>' +
     '<div class="form-row">' +
       '<div class="form-group">' +
@@ -722,8 +745,8 @@ function projectFormHTML(p) {
       '</div>' +
     '</div>' +
     '<div class="form-group">' +
-      '<label class="form-label">Completion %</label>' +
-      '<input class="form-input" id="f-completion" type="number" min="0" max="100" value="' + escapeHTML(String(p.completion || 0)) + '">' +
+      '<label class="form-label">Completion: <span id="f-completion-display">' + completionVal + '%</span></label>' +
+      '<input class="form-range" id="f-completion" type="range" min="0" max="100" value="' + completionVal + '">' +
     '</div>';
 }
 
@@ -732,17 +755,21 @@ function editProject(id) {
   if (!project) return;
   openModal("Edit Project", projectFormHTML(project), function() {
     var name = document.getElementById("f-name").value.trim();
-    if (!name) { showToast("Name is required", "error"); return false; }
+    var repoUrl = document.getElementById("f-repoUrl").value.trim();
+    if (!validateProjectForm(name, repoUrl)) return false;
     DataService.updateProject(id, {
       name: name,
+      description: document.getElementById("f-description").value.trim(),
+      repoUrl: repoUrl,
       status: document.getElementById("f-status").value,
       teamSize: parseInt(document.getElementById("f-teamSize").value) || project.teamSize,
-      completion: parseInt(document.getElementById("f-completion").value) || project.completion,
+      completion: parseInt(document.getElementById("f-completion").value) || 0,
       lastUpdated: new Date().toISOString().split('T')[0]
     });
     renderProjects();
     showToast("Project updated");
   });
+  setupCompletionSlider();
 }
 
 function deleteProject(id) {
@@ -756,9 +783,12 @@ function deleteProject(id) {
 function addNewProject() {
   openModal("Add Project", projectFormHTML(), function() {
     var name = document.getElementById("f-name").value.trim();
-    if (!name) { showToast("Name is required", "error"); return false; }
+    var repoUrl = document.getElementById("f-repoUrl").value.trim();
+    if (!validateProjectForm(name, repoUrl)) return false;
     DataService.addProject({
       name: name,
+      description: document.getElementById("f-description").value.trim(),
+      repoUrl: repoUrl,
       status: document.getElementById("f-status").value,
       teamSize: parseInt(document.getElementById("f-teamSize").value) || 10,
       completion: parseInt(document.getElementById("f-completion").value) || 0,
@@ -767,6 +797,70 @@ function addNewProject() {
     renderProjects();
     showToast("Project added");
   });
+  setupCompletionSlider();
+}
+
+function validateProjectForm(name, repoUrl) {
+  var valid = true;
+  var nameEl = document.getElementById("f-name");
+  var nameErr = document.getElementById("f-name-error");
+  var urlEl = document.getElementById("f-repoUrl");
+  var urlErr = document.getElementById("f-repoUrl-error");
+
+  if (!name) {
+    nameEl.classList.add("form-input-error");
+    nameErr.classList.add("visible");
+    showToast("Project name is required", "error");
+    valid = false;
+  } else {
+    nameEl.classList.remove("form-input-error");
+    nameErr.classList.remove("visible");
+  }
+
+  if (repoUrl && !isValidURL(repoUrl)) {
+    urlEl.classList.add("form-input-error");
+    urlErr.classList.add("visible");
+    showToast("Please enter a valid URL", "error");
+    valid = false;
+  } else {
+    urlEl.classList.remove("form-input-error");
+    urlErr.classList.remove("visible");
+  }
+
+  return valid;
+}
+
+function isValidURL(str) {
+  try { new URL(str); return true; } catch(e) { return false; }
+}
+
+function setupCompletionSlider() {
+  setTimeout(function() {
+    var slider = document.getElementById("f-completion");
+    var display = document.getElementById("f-completion-display");
+    if (slider && display) {
+      slider.addEventListener("input", function() {
+        display.textContent = slider.value + "%";
+      });
+    }
+    // Clear validation errors on input
+    var nameEl = document.getElementById("f-name");
+    var nameErr = document.getElementById("f-name-error");
+    if (nameEl && nameErr) {
+      nameEl.addEventListener("input", function() {
+        nameEl.classList.remove("form-input-error");
+        nameErr.classList.remove("visible");
+      });
+    }
+    var urlEl = document.getElementById("f-repoUrl");
+    var urlErr = document.getElementById("f-repoUrl-error");
+    if (urlEl && urlErr) {
+      urlEl.addEventListener("input", function() {
+        urlEl.classList.remove("form-input-error");
+        urlErr.classList.remove("visible");
+      });
+    }
+  }, 60);
 }
 
 // Assets
