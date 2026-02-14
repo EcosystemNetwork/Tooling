@@ -62,7 +62,7 @@ const DataService = {
   // Generic CRUD helpers
   _addItem(key, item) {
     const items = this.load(key);
-    const maxId = items.length > 0 ? Math.max(...items.map(i => i.id || 0)) : 0;
+    const maxId = items.reduce((max, i) => Math.max(max, i.id || 0), 0);
     item.id = maxId + 1;
     items.push(item);
     this.save(key, items);
@@ -1238,7 +1238,7 @@ function assetFormHTML(a) {
     '<div class="form-row">' +
       '<div class="form-group">' +
         '<label class="form-label">Type</label>' +
-        '<select class="form-select" id="f-type">' + selectOptions(assetTypes.filter(function(t) { return t !== "All"; }), a.type || "3D Models") + '</select>' +
+        '<select class="form-select" id="f-type">' + selectOptions(assetTypes.filter(t => t !== "All"), a.type || "3D Models") + '</select>' +
       '</div>' +
       '<div class="form-group">' +
         '<label class="form-label">Size</label>' +
