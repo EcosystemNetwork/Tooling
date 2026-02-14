@@ -25,6 +25,55 @@ export default function SceneViewer() {
   const [axesHelper, setAxesHelper] = useState(true);
   const showToast = useToast();
 
+  const createObject = (scene, type, color, isWireframe) => {
+    let geometry;
+    switch (type) {
+      case 'cube':
+        geometry = new THREE.BoxGeometry(2, 2, 2);
+        break;
+      case 'sphere':
+        geometry = new THREE.SphereGeometry(1.5, 32, 32);
+        break;
+      case 'torus':
+        geometry = new THREE.TorusGeometry(1.5, 0.5, 16, 100);
+        break;
+      case 'cone':
+        geometry = new THREE.ConeGeometry(1.5, 3, 32);
+        break;
+      case 'cylinder':
+        geometry = new THREE.CylinderGeometry(1.5, 1.5, 3, 32);
+        break;
+      case 'tetrahedron':
+        geometry = new THREE.TetrahedronGeometry(2);
+        break;
+      case 'octahedron':
+        geometry = new THREE.OctahedronGeometry(2);
+        break;
+      case 'dodecahedron':
+        geometry = new THREE.DodecahedronGeometry(2);
+        break;
+      case 'icosahedron':
+        geometry = new THREE.IcosahedronGeometry(2);
+        break;
+      case 'torusknot':
+        geometry = new THREE.TorusKnotGeometry(1.5, 0.5, 100, 16);
+        break;
+      default:
+        geometry = new THREE.BoxGeometry(2, 2, 2);
+    }
+
+    const material = new THREE.MeshStandardMaterial({
+      color: color,
+      wireframe: isWireframe,
+      metalness: 0.3,
+      roughness: 0.4,
+    });
+
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+    meshRef.current = mesh;
+  };
+
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -87,56 +136,6 @@ export default function SceneViewer() {
       const axes = new THREE.AxesHelper(5);
       scene.add(axes);
     }
-
-    // Create object function
-    const createObject = (scene, type, color, wireframe) => {
-      let geometry;
-      switch (type) {
-        case 'cube':
-          geometry = new THREE.BoxGeometry(2, 2, 2);
-          break;
-        case 'sphere':
-          geometry = new THREE.SphereGeometry(1.5, 32, 32);
-          break;
-        case 'torus':
-          geometry = new THREE.TorusGeometry(1.5, 0.5, 16, 100);
-          break;
-        case 'cone':
-          geometry = new THREE.ConeGeometry(1.5, 3, 32);
-          break;
-        case 'cylinder':
-          geometry = new THREE.CylinderGeometry(1.5, 1.5, 3, 32);
-          break;
-        case 'tetrahedron':
-          geometry = new THREE.TetrahedronGeometry(2);
-          break;
-        case 'octahedron':
-          geometry = new THREE.OctahedronGeometry(2);
-          break;
-        case 'dodecahedron':
-          geometry = new THREE.DodecahedronGeometry(2);
-          break;
-        case 'icosahedron':
-          geometry = new THREE.IcosahedronGeometry(2);
-          break;
-        case 'torusknot':
-          geometry = new THREE.TorusKnotGeometry(1.5, 0.5, 100, 16);
-          break;
-        default:
-          geometry = new THREE.BoxGeometry(2, 2, 2);
-      }
-
-      const material = new THREE.MeshStandardMaterial({
-        color: color,
-        wireframe: wireframe,
-        metalness: 0.3,
-        roughness: 0.4,
-      });
-
-      const mesh = new THREE.Mesh(geometry, material);
-      scene.add(mesh);
-      meshRef.current = mesh;
-    };
 
     // Create initial object
     createObject(scene, objectType, objectColor, wireframe);
