@@ -1,8 +1,71 @@
-# Dev Tools Control Center (DTCC)
+# GameForge Studio
 
-A comprehensive React-based dashboard application for managing development projects, assets, team members, and events. Built with React, React Router, and Vite. Each section is its own page with client-side routing. Data is persisted using browser LocalStorage.
+A comprehensive browser-based game development tooling platform built with React, Three.js, and Babylon.js. Features include 3D scene visualization, shader editing, performance monitoring, and a complete suite of project management tools. Perfect for web-based game development with Three.js and Babylon.js.
 
-## Features
+## Game Development Features
+
+### 🎮 3D Scene Playground (`/scene-viewer`)
+- **Interactive Three.js Scene Viewer** with real-time rendering
+- Multiple 3D primitive geometries (Cube, Sphere, Torus, Cone, Cylinder, Platonic Solids, Torus Knot)
+- Adjustable object colors and wireframe mode
+- Scene customization: background color, lighting intensity
+- Visual helpers: grid, axes, FPS stats overlay
+- Rotation controls for all three axes
+- OrbitControls for camera manipulation
+- Screenshot capture functionality
+- Camera reset
+
+### 🎨 Shader Lab (`/shader-lab`)
+- **Live GLSL Shader Editor** with instant compilation
+- Split-screen view: code editor + live preview
+- Pre-built shader presets:
+  - Rainbow Gradient
+  - Animated Waves
+  - Plasma Effect
+  - Perlin-like Noise
+  - Grid Pattern
+  - Toon Shading
+- Separate vertex and fragment shader editors
+- Real-time error reporting
+- Uniform support (time, resolution)
+- Varying support (UV coordinates, vertex positions)
+
+### ⚡ Performance Monitor (`/performance`)
+- **Real-time FPS Counter** with 30-second history graph
+- **JavaScript Heap Memory Usage** tracking
+- **WebGL Capabilities Detection**:
+  - Version and vendor information
+  - Renderer details
+  - GLSL version
+  - Maximum texture size, vertex attributes, texture units
+  - Supported extensions count
+- **WebGPU Support** detection
+- **Browser Information**: User agent, platform, CPU cores, device memory
+
+### 📚 Game Dev Resources (`/resources`)
+- Curated collection of **12+ essential resources** for game development
+- Categories: Documentation, Examples, Learning, Tools, Assets
+- Framework filters: Three.js, Babylon.js, WebGL, GLSL
+- Direct links to official documentation, playgrounds, and tutorials
+- Quick start guides with npm installation commands
+- Performance tips and best practices
+- Asset libraries (Poly Haven, Sketchfab, glTF samples)
+
+### 💻 Code Snippets (`/code-snippets`)
+- **8+ Ready-to-Use Code Templates** for common patterns
+- Categories: Setup, Loading, Shaders, Physics, Effects, Interaction
+- Three.js and Babylon.js snippets:
+  - Basic scene setup
+  - GLTF model loading with animations
+  - Custom shader materials
+  - Physics integration (Cannon.js)
+  - Post-processing effects (Bloom, FXAA)
+  - Raycasting for object picking
+  - Particle systems
+- One-click code copying
+- Expandable code viewer with syntax highlighting
+
+## Project Management Features
 
 ### 📊 Project Dashboard (`/`)
 - View and manage multiple development projects
@@ -49,8 +112,11 @@ A comprehensive React-based dashboard application for managing development proje
 ## Tech Stack
 
 - **React 19** — UI framework
-- **React Router 7** — Client-side routing (each tab is its own page)
+- **React Router 7** — Client-side routing
 - **Vite** — Build tool and dev server
+- **Three.js** — 3D graphics library for WebGL
+- **Babylon.js** — Full-featured 3D game engine
+- **Stats.js** — Performance monitoring
 - **LocalStorage** — Client-side data persistence
 
 ## Getting Started

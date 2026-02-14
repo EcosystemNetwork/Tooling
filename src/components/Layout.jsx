@@ -5,7 +5,12 @@ import { useToast } from './Toast';
 
 const navItems = [
   { to: '/', icon: '📊', label: 'Dashboard' },
-  { to: '/assets', icon: '🎨', label: 'Assets' },
+  { to: '/scene-viewer', icon: '🎮', label: '3D Scene' },
+  { to: '/shader-lab', icon: '🎨', label: 'Shader Lab' },
+  { to: '/assets', icon: '🗂️', label: 'Assets' },
+  { to: '/code-snippets', icon: '💻', label: 'Snippets' },
+  { to: '/resources', icon: '📚', label: 'Resources' },
+  { to: '/performance', icon: '⚡', label: 'Performance' },
   { to: '/builds', icon: '🚀', label: 'Builds' },
   { to: '/team', icon: '👥', label: 'Team' },
   { to: '/events', icon: '📅', label: 'Events' },
@@ -79,7 +84,7 @@ export default function Layout() {
         <button className="hamburger" onClick={toggleSidebar} aria-label="Toggle menu">
           <span></span><span></span><span></span>
         </button>
-        <h1 className="header-title">Dev Tools Control Center</h1>
+        <h1 className="header-title">GameForge Studio</h1>
         <div className="header-controls">
           <button className="header-btn" onClick={exportAllData} title="Export Data">💾 Export</button>
           <button className="header-btn" onClick={importData} title="Import Data">📥 Import</button>
@@ -93,7 +98,7 @@ export default function Layout() {
 
       {/* Sidebar Navigation */}
       <nav className={`sidebar${sidebarOpen ? ' open' : ''}`}>
-        <div className="sidebar-logo">DTCC</div>
+        <div className="sidebar-logo">GF</div>
         <ul className="sidebar-nav">
           {navItems.map(item => (
             <li key={item.to}>

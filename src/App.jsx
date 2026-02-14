@@ -7,6 +7,11 @@ import Builds from './pages/Builds';
 import Team from './pages/Team';
 import Events from './pages/Events';
 import Analytics from './pages/Analytics';
+import SceneViewer from './pages/SceneViewer';
+import ShaderLab from './pages/ShaderLab';
+import Performance from './pages/Performance';
+import Resources from './pages/Resources';
+import CodeSnippets from './pages/CodeSnippets';
 
 function App() {
   return (
@@ -20,6 +25,11 @@ function App() {
             <Route path="/team" element={<Team />} />
             <Route path="/events" element={<Events />} />
             <Route path="/analytics" element={<Analytics />} />
+            <Route path="/scene-viewer" element={<SceneViewer />} />
+            <Route path="/shader-lab" element={<ShaderLab />} />
+            <Route path="/performance" element={<Performance />} />
+            <Route path="/resources" element={<Resources />} />
+            <Route path="/code-snippets" element={<CodeSnippets />} />
           </Route>
         </Routes>
       </ToastProvider>
