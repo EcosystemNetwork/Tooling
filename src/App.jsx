@@ -12,6 +12,8 @@ import ShaderLab from './pages/ShaderLab';
 import Performance from './pages/Performance';
 import Resources from './pages/Resources';
 import CodeSnippets from './pages/CodeSnippets';
+import Calendar from './pages/Calendar';
+import Timeline from './pages/Timeline';
 
 function App() {
   return (
@@ -30,6 +32,8 @@ function App() {
             <Route path="/performance" element={<Performance />} />
             <Route path="/resources" element={<Resources />} />
             <Route path="/code-snippets" element={<CodeSnippets />} />
+            <Route path="/calendar" element={<Calendar />} />
+            <Route path="/timeline" element={<Timeline />} />
           </Route>
         </Routes>
       </ToastProvider>

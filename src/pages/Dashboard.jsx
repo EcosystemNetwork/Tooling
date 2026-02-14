@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import DataService from '../services/DataService';
 import Modal from '../components/Modal';
 import { useToast } from '../components/Toast';
@@ -20,6 +20,8 @@ export default function Dashboard() {
   const [deleteId, setDeleteId] = useState(null);
   const [form, setForm] = useState({});
   const [errors, setErrors] = useState({});
+  const [dragOverId, setDragOverId] = useState(null);
+  const dragItem = useRef(null);
   const showToast = useToast();
 
   const refresh = () => setProjects(DataService.getProjects());
@@ -80,15 +82,72 @@ export default function Dashboard() {
     showToast('Project deleted', 'info');
   }, [deleteId, showToast]);
 
+  // Drag-and-drop handlers
+  const handleDragStart = (e, index) => {
+    dragItem.current = index;
+    e.dataTransfer.effectAllowed = 'move';
+    e.currentTarget.style.opacity = '0.5';
+  };
+
+  const handleDragEnd = (e) => {
+    e.currentTarget.style.opacity = '1';
+    dragItem.current = null;
+    setDragOverId(null);
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverId(index);
+  };
+
+  const handleDragLeave = (e) => {
+    if (e.currentTarget.contains(e.relatedTarget)) return;
+    setDragOverId(null);
+  };
+
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault();
+    const dragIndex = dragItem.current;
+    if (dragIndex === null || dragIndex === dropIndex) {
+      setDragOverId(null);
+      return;
+    }
+    const reordered = [...projects];
+    const [moved] = reordered.splice(dragIndex, 1);
+    reordered.splice(dropIndex, 0, moved);
+    setProjects(reordered);
+    DataService.saveProjects(reordered);
+    setDragOverId(null);
+    dragItem.current = null;
+    showToast('Projects reordered');
+  };
+
   return (
     <section className="section">
       <div className="section-header">
         <h2 className="section-title">Project Dashboard Overview</h2>
         <button className="add-btn" onClick={openAdd}>+ Add Project</button>
       </div>
+      <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '16px' }}>💡 Drag and drop cards to rearrange</p>
       <div className="project-grid">
         {projects.map((p, i) => (
-          <div key={p.id} className="card project-card reveal-item" style={{ animationDelay: `${i * 0.07}s` }}>
+          <div
+            key={p.id}
+            className="card project-card reveal-item"
+            style={{
+              animationDelay: `${i * 0.07}s`,
+              cursor: 'grab',
+              outline: dragOverId === i ? '2px solid var(--green-primary)' : 'none',
+              outlineOffset: '2px',
+            }}
+            draggable
+            onDragStart={ev => handleDragStart(ev, i)}
+            onDragEnd={handleDragEnd}
+            onDragOver={ev => handleDragOver(ev, i)}
+            onDragLeave={handleDragLeave}
+            onDrop={ev => handleDrop(ev, i)}
+          >
             <div className="project-header">
               <div className="project-name">{p.name}</div>
               <span className={`badge ${statusBadgeClass(p.status)}`}>{p.status}</span>
