@@ -14,6 +14,8 @@ const navItems = [
   { to: '/builds', icon: '🚀', label: 'Builds' },
   { to: '/team', icon: '👥', label: 'Team' },
   { to: '/events', icon: '📅', label: 'Events' },
+  { to: '/calendar', icon: '🗓️', label: 'Calendar' },
+  { to: '/timeline', icon: '⏳', label: 'Timeline' },
   { to: '/analytics', icon: '📈', label: 'Analytics' },
 ];
 
