@@ -1,40 +1,40 @@
 # Dev Tools Control Center (DTCC)
 
-A comprehensive web-based dashboard application for managing development projects, assets, team members, and events. This application features persistent data storage using LocalStorage, allowing you to enter and manage real data.
+A comprehensive React-based dashboard application for managing development projects, assets, team members, and events. Built with React, React Router, and Vite. Each section is its own page with client-side routing. Data is persisted using browser LocalStorage.
 
 ## Features
 
-### 📊 Project Dashboard
+### 📊 Project Dashboard (`/`)
 - View and manage multiple development projects
 - Track project status, team size, and completion percentage
 - Add, edit, and delete projects
 - Monitor last updated dates
 
-### 🎨 Asset Manager
+### 🎨 Asset Manager (`/assets`)
 - Organize and categorize development assets (3D Models, Textures, Audio, Animations, UI Elements)
 - Search and filter assets by type
 - Track asset metadata including size and author
 - Add, edit, and delete assets
 
-### 🚀 Build & Deploy Pipeline
+### 🚀 Build & Deploy Pipeline (`/builds`)
 - Monitor build and deployment status
 - Track build duration and triggered by information
 - View build history with timestamps
 - Add, edit, and delete build entries
 
-### 👥 Team Management
+### 👥 Team Management (`/team`)
 - Manage team members and their roles (Admin, Developer, Artist, QA, Viewer)
 - Track member status and last login times
 - Add, edit, and delete team members
 - Assign role-based permissions
 
-### 📅 Events Schedule
+### 📅 Events Schedule (`/events`)
 - Schedule and track live operations and events
 - Categorize events by type (Seasonal, Update, Tournament, Hotfix)
 - Monitor event status (Upcoming, Live, Ended)
 - Add, edit, and delete events
 
-### 📈 Analytics & KPIs
+### 📈 Analytics & KPIs (`/analytics`)
 - View key performance indicators
 - Track metrics with trend indicators
 - Monitor daily active users, revenue, retention rate, and more
@@ -46,53 +46,85 @@ A comprehensive web-based dashboard application for managing development project
 - **Import Data**: Upload a JSON file to restore or migrate data
 - **Reset**: Clear all data and restore default examples
 
+## Tech Stack
+
+- **React 19** — UI framework
+- **React Router 7** — Client-side routing (each tab is its own page)
+- **Vite** — Build tool and dev server
+- **LocalStorage** — Client-side data persistence
+
 ## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and npm
 
 ### Installation
 
-1. Clone or download this repository
-2. No build process or dependencies required - it's a standalone HTML/CSS/JS application
-
-### Running the Application
-
-Simply open `index.html` in a modern web browser:
-
 ```bash
-# Using a local server (recommended)
-python -m http.server 8000
-# or
-npx serve
+# Clone the repository
+git clone <repo-url>
+cd Tooling
 
-# Then navigate to http://localhost:8000
+# Install dependencies
+npm install
 ```
 
-Or directly open the file:
+### Development
+
 ```bash
-open index.html  # macOS
-start index.html # Windows
-xdg-open index.html # Linux
+npm run dev
+```
+
+Then open [http://localhost:5173](http://localhost:5173) in your browser.
+
+### Production Build
+
+```bash
+npm run build
+npm run preview
+```
+
+## Project Structure
+
+```
+src/
+├── main.jsx                # Entry point
+├── App.jsx                 # Root component with React Router setup
+├── index.css               # Global styles
+├── components/
+│   ├── Layout.jsx          # Shared layout (sidebar, header)
+│   ├── Modal.jsx           # Reusable modal component
+│   └── Toast.jsx           # Toast notification system
+├── pages/
+│   ├── Dashboard.jsx       # Project Dashboard page (/)
+│   ├── Assets.jsx          # Asset Manager page (/assets)
+│   ├── Builds.jsx          # Build Pipeline page (/builds)
+│   ├── Team.jsx            # Team Management page (/team)
+│   ├── Events.jsx          # Events Schedule page (/events)
+│   └── Analytics.jsx       # Analytics & KPIs page (/analytics)
+└── services/
+    └── DataService.js      # LocalStorage data service layer
 ```
 
 ## Usage Guide
 
 ### Adding New Items
 
-Each section has an "Add" button in the top-right corner:
+Each page has an "Add" button in the top-right corner:
 
-1. **Add Project**: Click "+ Add Project" in the Dashboard section
-2. **Add Asset**: Click "+ Add Asset" in the Asset Manager section
-3. **Add Build**: Click "+ Add Build" in the Build Pipeline section
-4. **Add Team Member**: Click "+ Add Member" in the Team section
-5. **Add Event**: Click "+ Add Event" in the Events section
-6. **Add KPI**: Click "+ Add KPI" in the Analytics section
-
-Follow the prompts to enter the required information.
+1. **Add Project**: Click "+ Add Project" on the Dashboard page
+2. **Add Asset**: Click "+ Add Asset" on the Assets page
+3. **Add Build**: Click "+ Add Build" on the Builds page
+4. **Add Team Member**: Click "+ Add Member" on the Team page
+5. **Add Event**: Click "+ Add Event" on the Events page
+6. **Add KPI**: Click "+ Add KPI" on the Analytics page
 
 ### Editing Items
 
 Each item card or row has an edit button (✏️):
 - Click the edit icon
-- Update the information in the prompts
+- Update the information in the modal form
 - Changes are automatically saved
 
 ### Deleting Items
@@ -104,7 +136,7 @@ Each item has a delete button (🗑️):
 
 ### Searching and Filtering
 
-**Asset Search**: Use the search bar in the Asset Manager to find assets by name or author.
+**Asset Search**: Use the search bar on the Assets page to find assets by name or author.
 
 **Asset Type Filter**: Click on type tags (All, 3D Models, Textures, etc.) to filter assets by category.
 
@@ -113,108 +145,18 @@ Each item has a delete button (🗑️):
 Access data management controls in the top header:
 
 - **💾 Export**: Download all your data as a JSON file for backup or migration
-- **📥 Import**: Upload a previously exported JSON file to restore data
+- **�� Import**: Upload a previously exported JSON file to restore data
 - **🔄 Reset**: Clear all data and restore the default example dataset
-
-## Data Structure
-
-All data is stored in browser LocalStorage with the following keys:
-
-```javascript
-{
-  "projects": [...],      // Project entries
-  "assets": [...],        // Asset entries
-  "builds": [...],        // Build history
-  "teamMembers": [...],   // Team member profiles
-  "events": [...],        // Event schedules
-  "kpis": [...]          // KPI metrics
-}
-```
-
-### Example Data Format
-
-**Project**:
-```json
-{
-  "id": 1,
-  "name": "Nebula Frontier",
-  "status": "Active",
-  "teamSize": 24,
-  "lastUpdated": "2026-02-10",
-  "completion": 78
-}
-```
-
-**Asset**:
-```json
-{
-  "id": 1,
-  "name": "Spaceship Hull",
-  "type": "3D Models",
-  "size": "14.2 MB",
-  "author": "J. Park",
-  "color": "#1e88e5"
-}
-```
-
-**Team Member**:
-```json
-{
-  "id": 1,
-  "name": "Jordan Park",
-  "email": "j.park@studio.io",
-  "role": "Admin",
-  "status": "Active",
-  "lastLogin": "2026-02-10 14:00",
-  "color": "#1e88e5"
-}
-```
-
-**Event**:
-```json
-{
-  "id": 1,
-  "name": "Winter Clash 2026",
-  "game": "Shadowkeep Arena",
-  "start": "2026-02-15",
-  "end": "2026-03-15",
-  "status": "Upcoming",
-  "type": "Seasonal"
-}
-```
-
-## Browser Compatibility
-
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
-
-LocalStorage must be enabled in your browser.
-
-## Data Persistence
-
-- Data is stored locally in your browser using LocalStorage
-- Data persists across browser sessions
-- Data is specific to the domain/origin
-- Maximum storage: ~5-10MB (browser dependent)
-- Clearing browser data will delete stored information (use Export feature for backups)
 
 ## Customization
 
 ### Modifying Default Data
 
-Edit the `getDefault*()` methods in `app.js` to change the initial example data:
-- `getDefaultProjects()`
-- `getDefaultAssets()`
-- `getDefaultBuilds()`
-- `getDefaultTeamMembers()`
-- `getDefaultEvents()`
-- `getDefaultKPIs()`
+Edit the `getDefault*()` methods in `src/services/DataService.js` to change the initial example data.
 
 ### Styling
 
-Edit `styles.css` to customize colors, fonts, and layout. Key CSS variables are defined in the `:root` selector:
+Edit `src/index.css` to customize colors, fonts, and layout. Key CSS variables are defined in the `:root` selector:
 
 ```css
 :root {
@@ -230,37 +172,29 @@ Edit `styles.css` to customize colors, fonts, and layout. Key CSS variables are 
 
 ### Static Hosting
 
-Deploy to any static hosting service:
+Build the project and deploy the `dist` folder to any static hosting service:
 
-- **GitHub Pages**: Push to a repository and enable Pages
-- **Netlify**: Drag and drop the folder or connect to Git
+```bash
+npm run build
+```
+
+- **GitHub Pages**: Push the `dist` folder or use a CI/CD pipeline
+- **Netlify**: Connect to Git and set build command to `npm run build`
 - **Vercel**: Import the project and deploy
-- **AWS S3**: Upload files to an S3 bucket with static hosting enabled
+- **AWS S3**: Upload `dist` files to an S3 bucket with static hosting enabled
 
 ### No Backend Required
 
 This application runs entirely in the browser with no server-side dependencies. All data is stored locally using browser LocalStorage.
 
-## Limitations
+## Browser Compatibility
 
-- Data is stored locally per browser/device
-- No multi-user collaboration (single-user application)
-- No real-time sync across devices
-- Storage limited to browser's LocalStorage capacity (~5-10MB)
-- No authentication or user management
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
 
-## Future Enhancements
-
-To make this a production-ready application with real data sharing:
-
-1. **Backend API**: Add a Node.js/Express backend with database (PostgreSQL, MongoDB)
-2. **Authentication**: Implement user login and authentication
-3. **Real-time Sync**: Add WebSocket support for live updates
-4. **File Uploads**: Support actual file uploads for assets
-5. **Multi-user**: Add collaboration features and permissions
-6. **Cloud Storage**: Store assets in cloud storage (AWS S3, Azure Blob)
-7. **Advanced Analytics**: Integrate with analytics platforms
-8. **API Integration**: Connect to CI/CD tools, project management systems
+LocalStorage must be enabled in your browser.
 
 ## License
 
