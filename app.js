@@ -59,6 +59,31 @@ const DataService = {
     localStorage.setItem(key, JSON.stringify(data));
   },
 
+  // Generic CRUD helpers
+  _addItem(key, item) {
+    const items = this.load(key);
+    const maxId = items.length > 0 ? Math.max(...items.map(i => i.id || 0)) : 0;
+    item.id = maxId + 1;
+    items.push(item);
+    this.save(key, items);
+    return item;
+  },
+
+  _updateItem(key, id, data) {
+    const items = this.load(key);
+    const idx = items.findIndex(i => i.id === id);
+    if (idx !== -1) {
+      items[idx] = { ...items[idx], ...data };
+      this.save(key, items);
+      return items[idx];
+    }
+    return null;
+  },
+
+  _deleteItem(key, id) {
+    this.save(key, this.load(key).filter(i => i.id !== id));
+  },
+
   // Projects
   getProjects() {
     return this.load(this.KEYS.PROJECTS);
@@ -273,78 +298,30 @@ const DataService = {
   // Scenes
   getScenes() { return this.load(this.KEYS.SCENES); },
   saveScenes(scenes) { this.save(this.KEYS.SCENES, scenes); },
-  addScene(scene) {
-    const scenes = this.getScenes();
-    const maxId = scenes.length > 0 ? Math.max(...scenes.map(s => s.id || 0)) : 0;
-    scene.id = maxId + 1;
-    scenes.push(scene);
-    this.saveScenes(scenes);
-    return scene;
-  },
-  updateScene(id, data) {
-    const scenes = this.getScenes();
-    const idx = scenes.findIndex(s => s.id === id);
-    if (idx !== -1) { scenes[idx] = { ...scenes[idx], ...data }; this.saveScenes(scenes); return scenes[idx]; }
-    return null;
-  },
-  deleteScene(id) { this.saveScenes(this.getScenes().filter(s => s.id !== id)); },
+  addScene(scene) { return this._addItem(this.KEYS.SCENES, scene); },
+  updateScene(id, data) { return this._updateItem(this.KEYS.SCENES, id, data); },
+  deleteScene(id) { this._deleteItem(this.KEYS.SCENES, id); },
 
   // Shaders
   getShaders() { return this.load(this.KEYS.SHADERS); },
   saveShaders(shaders) { this.save(this.KEYS.SHADERS, shaders); },
-  addShader(shader) {
-    const shaders = this.getShaders();
-    const maxId = shaders.length > 0 ? Math.max(...shaders.map(s => s.id || 0)) : 0;
-    shader.id = maxId + 1;
-    shaders.push(shader);
-    this.saveShaders(shaders);
-    return shader;
-  },
-  updateShader(id, data) {
-    const shaders = this.getShaders();
-    const idx = shaders.findIndex(s => s.id === id);
-    if (idx !== -1) { shaders[idx] = { ...shaders[idx], ...data }; this.saveShaders(shaders); return shaders[idx]; }
-    return null;
-  },
-  deleteShader(id) { this.saveShaders(this.getShaders().filter(s => s.id !== id)); },
+  addShader(shader) { return this._addItem(this.KEYS.SHADERS, shader); },
+  updateShader(id, data) { return this._updateItem(this.KEYS.SHADERS, id, data); },
+  deleteShader(id) { this._deleteItem(this.KEYS.SHADERS, id); },
 
   // Snippets
   getSnippets() { return this.load(this.KEYS.SNIPPETS); },
   saveSnippets(snippets) { this.save(this.KEYS.SNIPPETS, snippets); },
-  addSnippet(snippet) {
-    const snippets = this.getSnippets();
-    const maxId = snippets.length > 0 ? Math.max(...snippets.map(s => s.id || 0)) : 0;
-    snippet.id = maxId + 1;
-    snippets.push(snippet);
-    this.saveSnippets(snippets);
-    return snippet;
-  },
-  updateSnippet(id, data) {
-    const snippets = this.getSnippets();
-    const idx = snippets.findIndex(s => s.id === id);
-    if (idx !== -1) { snippets[idx] = { ...snippets[idx], ...data }; this.saveSnippets(snippets); return snippets[idx]; }
-    return null;
-  },
-  deleteSnippet(id) { this.saveSnippets(this.getSnippets().filter(s => s.id !== id)); },
+  addSnippet(snippet) { return this._addItem(this.KEYS.SNIPPETS, snippet); },
+  updateSnippet(id, data) { return this._updateItem(this.KEYS.SNIPPETS, id, data); },
+  deleteSnippet(id) { this._deleteItem(this.KEYS.SNIPPETS, id); },
 
   // Performance Metrics
   getPerfMetrics() { return this.load(this.KEYS.PERF_METRICS); },
   savePerfMetrics(metrics) { this.save(this.KEYS.PERF_METRICS, metrics); },
-  addPerfMetric(metric) {
-    const metrics = this.getPerfMetrics();
-    const maxId = metrics.length > 0 ? Math.max(...metrics.map(m => m.id || 0)) : 0;
-    metric.id = maxId + 1;
-    metrics.push(metric);
-    this.savePerfMetrics(metrics);
-    return metric;
-  },
-  updatePerfMetric(id, data) {
-    const metrics = this.getPerfMetrics();
-    const idx = metrics.findIndex(m => m.id === id);
-    if (idx !== -1) { metrics[idx] = { ...metrics[idx], ...data }; this.savePerfMetrics(metrics); return metrics[idx]; }
-    return null;
-  },
-  deletePerfMetric(id) { this.savePerfMetrics(this.getPerfMetrics().filter(m => m.id !== id)); },
+  addPerfMetric(metric) { return this._addItem(this.KEYS.PERF_METRICS, metric); },
+  updatePerfMetric(id, data) { return this._updateItem(this.KEYS.PERF_METRICS, id, data); },
+  deletePerfMetric(id) { this._deleteItem(this.KEYS.PERF_METRICS, id); },
 
   // Export all data
   exportData() {
@@ -611,6 +588,16 @@ let perfMetrics = [];
 
 // ===== Helpers =====
 
+function escapeHTML(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function getInitials(name) {
   return name.split(" ").map(w => w[0]).join("").toUpperCase();
 }
@@ -809,85 +796,87 @@ function sceneStatusClass(status) {
 }
 
 function renderScenes(filteredScenes) {
-  refreshData();
-  var grid = document.getElementById("sceneGrid");
-  var list = filteredScenes || scenes;
-  grid.innerHTML = list.map(function(s, i) {
-    var objTags = (s.objects || []).map(function(o) {
-      return '<span class="scene-obj-tag">' + escapeHTML(o) + '</span>';
-    }).join("");
-    return '<div class="card scene-card reveal-item" style="' + delay(i) + '">' +
-      '<div class="scene-header">' +
-        '<div class="scene-name">' + escapeHTML(s.name) + '</div>' +
-        '<span class="badge ' + sceneEngineClass(s.engine) + '">' + escapeHTML(s.engine) + '</span>' +
-      '</div>' +
-      '<div class="scene-engine">Status: <span class="badge ' + sceneStatusClass(s.status) + '">' + escapeHTML(s.status) + '</span></div>' +
-      '<div class="scene-stats">' +
-        '<span>📷 ' + escapeHTML(s.camera || 'Camera') + '</span>' +
-        '<span>💡 ' + s.lights + ' lights</span>' +
-        '<span>🔷 ' + s.meshes + ' meshes</span>' +
-        '<span>🖼️ ' + s.textures + ' textures</span>' +
-      '</div>' +
-      '<div class="scene-objects">' + objTags + '</div>' +
-      '<div class="card-actions">' +
-        '<button class="btn-icon" onclick="editScene(' + s.id + ')" title="Edit Scene">✏️</button>' +
-        '<button class="btn-icon" onclick="deleteScene(' + s.id + ')" title="Delete Scene">🗑️</button>' +
-      '</div>' +
-    '</div>';
+  if (!filteredScenes) refreshData();
+  const grid = document.getElementById("sceneGrid");
+  const list = filteredScenes || scenes;
+  grid.innerHTML = list.map((s, i) => {
+    const objTags = (s.objects || []).map(o =>
+      `<span class="scene-obj-tag">${escapeHTML(o)}</span>`
+    ).join("");
+    return `
+    <div class="card scene-card reveal-item" style="${delay(i)}">
+      <div class="scene-header">
+        <div class="scene-name">${escapeHTML(s.name)}</div>
+        <span class="badge ${sceneEngineClass(s.engine)}">${escapeHTML(s.engine)}</span>
+      </div>
+      <div class="scene-engine">Status: <span class="badge ${sceneStatusClass(s.status)}">${escapeHTML(s.status)}</span></div>
+      <div class="scene-stats">
+        <span>📷 ${escapeHTML(s.camera || 'Camera')}</span>
+        <span>💡 ${s.lights} lights</span>
+        <span>🔷 ${s.meshes} meshes</span>
+        <span>🖼️ ${s.textures} textures</span>
+      </div>
+      <div class="scene-objects">${objTags}</div>
+      <div class="card-actions">
+        <button class="btn-icon" onclick="editScene(${s.id})" title="Edit Scene">✏️</button>
+        <button class="btn-icon" onclick="deleteScene(${s.id})" title="Delete Scene">🗑️</button>
+      </div>
+    </div>`;
   }).join("");
 }
 
 // ===== Shader Library Renderers =====
 
 function renderShaders(filteredShaders) {
-  refreshData();
-  var grid = document.getElementById("shaderGrid");
-  var list = filteredShaders || shaders;
-  grid.innerHTML = list.map(function(s, i) {
-    var tags = (s.tags || []).map(function(t) {
-      return '<span class="shader-tag">' + escapeHTML(t) + '</span>';
-    }).join("");
-    return '<div class="card shader-card reveal-item" style="' + delay(i) + '">' +
-      '<div class="shader-preview" style="background: linear-gradient(135deg, ' + escapeHTML(s.color1 || '#1e88e5') + ', ' + escapeHTML(s.color2 || '#00c9a7') + ');"></div>' +
-      '<div class="shader-header">' +
-        '<div class="shader-name">' + escapeHTML(s.name) + '</div>' +
-        '<span class="badge ' + sceneEngineClass(s.engine) + '">' + escapeHTML(s.engine) + '</span>' +
-      '</div>' +
-      '<div class="shader-desc">' + escapeHTML(s.description || '') + '</div>' +
-      '<div style="margin-bottom:6px;"><span class="badge badge-beta">' + escapeHTML(s.type) + '</span></div>' +
-      '<div class="shader-tags">' + tags + '</div>' +
-      '<div class="card-actions">' +
-        '<button class="btn-icon" onclick="editShader(' + s.id + ')" title="Edit Shader">✏️</button>' +
-        '<button class="btn-icon" onclick="deleteShader(' + s.id + ')" title="Delete Shader">🗑️</button>' +
-      '</div>' +
-    '</div>';
+  if (!filteredShaders) refreshData();
+  const grid = document.getElementById("shaderGrid");
+  const list = filteredShaders || shaders;
+  grid.innerHTML = list.map((s, i) => {
+    const tags = (s.tags || []).map(t =>
+      `<span class="shader-tag">${escapeHTML(t)}</span>`
+    ).join("");
+    return `
+    <div class="card shader-card reveal-item" style="${delay(i)}">
+      <div class="shader-preview" style="background: linear-gradient(135deg, ${escapeHTML(s.color1 || '#1e88e5')}, ${escapeHTML(s.color2 || '#00c9a7')});"></div>
+      <div class="shader-header">
+        <div class="shader-name">${escapeHTML(s.name)}</div>
+        <span class="badge ${sceneEngineClass(s.engine)}">${escapeHTML(s.engine)}</span>
+      </div>
+      <div class="shader-desc">${escapeHTML(s.description || '')}</div>
+      <div style="margin-bottom:6px;"><span class="badge badge-beta">${escapeHTML(s.type)}</span></div>
+      <div class="shader-tags">${tags}</div>
+      <div class="card-actions">
+        <button class="btn-icon" onclick="editShader(${s.id})" title="Edit Shader">✏️</button>
+        <button class="btn-icon" onclick="deleteShader(${s.id})" title="Delete Shader">🗑️</button>
+      </div>
+    </div>`;
   }).join("");
 }
 
 // ===== Code Snippets Renderers =====
 
 function renderSnippets(filteredSnippets) {
-  refreshData();
-  var grid = document.getElementById("snippetGrid");
-  var list = filteredSnippets || snippets;
-  grid.innerHTML = list.map(function(s, i) {
-    return '<div class="card snippet-card reveal-item" style="' + delay(i) + '">' +
-      '<div class="snippet-header">' +
-        '<div class="snippet-title">' + escapeHTML(s.title) + '</div>' +
-        '<span class="badge ' + sceneEngineClass(s.engine) + '">' + escapeHTML(s.engine) + '</span>' +
-      '</div>' +
-      '<div class="snippet-desc">' + escapeHTML(s.description || '') + '</div>' +
-      '<div class="snippet-code">' + escapeHTML(s.code || '') + '</div>' +
-      '<div class="snippet-meta">' +
-        '<span>' + escapeHTML(s.category || 'General') + '</span>' +
-        '<button class="snippet-copy-btn" onclick="copySnippet(' + s.id + ')">📋 Copy</button>' +
-      '</div>' +
-      '<div class="card-actions">' +
-        '<button class="btn-icon" onclick="editSnippet(' + s.id + ')" title="Edit Snippet">✏️</button>' +
-        '<button class="btn-icon" onclick="deleteSnippet(' + s.id + ')" title="Delete Snippet">🗑️</button>' +
-      '</div>' +
-    '</div>';
-  }).join("");
+  if (!filteredSnippets) refreshData();
+  const grid = document.getElementById("snippetGrid");
+  const list = filteredSnippets || snippets;
+  grid.innerHTML = list.map((s, i) => `
+    <div class="card snippet-card reveal-item" style="${delay(i)}">
+      <div class="snippet-header">
+        <div class="snippet-title">${escapeHTML(s.title)}</div>
+        <span class="badge ${sceneEngineClass(s.engine)}">${escapeHTML(s.engine)}</span>
+      </div>
+      <div class="snippet-desc">${escapeHTML(s.description || '')}</div>
+      <div class="snippet-code">${escapeHTML(s.code || '')}</div>
+      <div class="snippet-meta">
+        <span>${escapeHTML(s.category || 'General')}</span>
+        <button class="snippet-copy-btn" onclick="copySnippet(${s.id})">📋 Copy</button>
+      </div>
+      <div class="card-actions">
+        <button class="btn-icon" onclick="editSnippet(${s.id})" title="Edit Snippet">✏️</button>
+        <button class="btn-icon" onclick="deleteSnippet(${s.id})" title="Delete Snippet">🗑️</button>
+      </div>
+    </div>`
+  ).join("");
 }
 
 // ===== Performance Monitor Renderers =====
@@ -908,43 +897,42 @@ function formatPerfValue(value) {
 function renderPerfMetrics() {
   refreshData();
 
-  // Render overview stats
-  var overview = document.getElementById("perfOverview");
-  var overviewStats = [
+  const overview = document.getElementById("perfOverview");
+  const overviewStats = [
     { label: "FPS Target", value: "60", unit: "fps", status: "good" },
     { label: "Draw Calls", value: perfMetrics.length > 0 ? formatPerfValue(perfMetrics[0].value) : "0", unit: perfMetrics.length > 0 ? perfMetrics[0].unit : "", status: perfMetrics.length > 0 ? perfColor(perfMetrics[0].value, perfMetrics[0].max) : "good" },
     { label: "Frame Budget", value: "16.67", unit: "ms", status: "good" },
     { label: "Metrics Tracked", value: String(perfMetrics.length), unit: "active", status: "good" }
   ];
-  overview.innerHTML = overviewStats.map(function(s) {
-    return '<div class="perf-stat-card reveal-item">' +
-      '<div class="perf-stat-label">' + escapeHTML(s.label) + '</div>' +
-      '<div class="perf-stat-value perf-stat-' + s.status + '">' + escapeHTML(s.value) + '</div>' +
-      '<div class="perf-stat-unit">' + escapeHTML(s.unit) + '</div>' +
-    '</div>';
-  }).join("");
+  overview.innerHTML = overviewStats.map(s => `
+    <div class="perf-stat-card reveal-item">
+      <div class="perf-stat-label">${escapeHTML(s.label)}</div>
+      <div class="perf-stat-value perf-stat-${s.status}">${escapeHTML(s.value)}</div>
+      <div class="perf-stat-unit">${escapeHTML(s.unit)}</div>
+    </div>`
+  ).join("");
 
-  // Render detailed metrics
-  var grid = document.getElementById("perfGrid");
-  grid.innerHTML = perfMetrics.map(function(m, i) {
-    var pct = Math.min((m.value / m.max) * 100, 100);
-    var colorClass = perfColor(m.value, m.max);
-    return '<div class="card perf-card reveal-item" style="' + delay(i) + '">' +
-      '<div class="perf-name">' + escapeHTML(m.name) + '</div>' +
-      '<div class="perf-category">' + escapeHTML(m.category) + '</div>' +
-      '<div class="perf-bar-wrapper">' +
-        '<div class="perf-bar-fill perf-bar-' + colorClass + '" style="width:' + pct + '%;"></div>' +
-      '</div>' +
-      '<div class="perf-detail">' +
-        '<span>' + formatPerfValue(m.value) + ' ' + escapeHTML(m.unit) + '</span>' +
-        '<span>max ' + formatPerfValue(m.max) + '</span>' +
-      '</div>' +
-      (m.tip ? '<div style="margin-top:8px;font-size:0.72rem;color:var(--text-muted);font-style:italic;">💡 ' + escapeHTML(m.tip) + '</div>' : '') +
-      '<div class="card-actions">' +
-        '<button class="btn-icon" onclick="editPerfMetric(' + m.id + ')" title="Edit Metric">✏️</button>' +
-        '<button class="btn-icon" onclick="deletePerfMetric(' + m.id + ')" title="Delete Metric">🗑️</button>' +
-      '</div>' +
-    '</div>';
+  const grid = document.getElementById("perfGrid");
+  grid.innerHTML = perfMetrics.map((m, i) => {
+    const pct = Math.min((m.value / m.max) * 100, 100);
+    const colorClass = perfColor(m.value, m.max);
+    return `
+    <div class="card perf-card reveal-item" style="${delay(i)}">
+      <div class="perf-name">${escapeHTML(m.name)}</div>
+      <div class="perf-category">${escapeHTML(m.category)}</div>
+      <div class="perf-bar-wrapper">
+        <div class="perf-bar-fill perf-bar-${colorClass}" style="width:${pct}%;"></div>
+      </div>
+      <div class="perf-detail">
+        <span>${formatPerfValue(m.value)} ${escapeHTML(m.unit)}</span>
+        <span>max ${formatPerfValue(m.max)}</span>
+      </div>
+      ${m.tip ? `<div style="margin-top:8px;font-size:0.72rem;color:var(--text-muted);font-style:italic;">💡 ${escapeHTML(m.tip)}</div>` : ''}
+      <div class="card-actions">
+        <button class="btn-icon" onclick="editPerfMetric(${m.id})" title="Edit Metric">✏️</button>
+        <button class="btn-icon" onclick="deletePerfMetric(${m.id})" title="Delete Metric">🗑️</button>
+      </div>
+    </div>`;
   }).join("");
 }
 
@@ -1014,19 +1002,18 @@ function setupNavLinks() {
 // ===== Engine Toggle (Scene Manager) =====
 
 function setupEngineToggle() {
-  var container = document.querySelector(".engine-toggle");
+  const container = document.querySelector(".engine-toggle");
   if (!container) return;
-  container.addEventListener("click", function(e) {
+  container.addEventListener("click", (e) => {
     if (!e.target.classList.contains("engine-btn")) return;
-    container.querySelectorAll(".engine-btn").forEach(function(b) { b.classList.remove("active"); });
+    container.querySelectorAll(".engine-btn").forEach(b => b.classList.remove("active"));
     e.target.classList.add("active");
-    var engine = e.target.dataset.engine;
+    const engine = e.target.dataset.engine;
     if (engine === "all") {
       renderScenes();
     } else {
-      var engineMap = { threejs: "Three.js", babylonjs: "Babylon.js" };
-      var filtered = scenes.filter(function(s) { return s.engine === engineMap[engine]; });
-      renderScenes(filtered);
+      const engineMap = { threejs: "Three.js", babylonjs: "Babylon.js" };
+      renderScenes(scenes.filter(s => s.engine === engineMap[engine]));
     }
   });
 }
@@ -1034,18 +1021,17 @@ function setupEngineToggle() {
 // ===== Shader Filters =====
 
 function setupShaderFilters() {
-  var container = document.querySelector(".shader-filters");
+  const container = document.querySelector(".shader-filters");
   if (!container) return;
-  container.addEventListener("click", function(e) {
+  container.addEventListener("click", (e) => {
     if (!e.target.classList.contains("tag-btn")) return;
-    container.querySelectorAll(".tag-btn").forEach(function(b) { b.classList.remove("active"); });
+    container.querySelectorAll(".tag-btn").forEach(b => b.classList.remove("active"));
     e.target.classList.add("active");
-    var type = e.target.dataset.shaderType;
+    const type = e.target.dataset.shaderType;
     if (type === "All") {
       renderShaders();
     } else {
-      var filtered = shaders.filter(function(s) { return s.type === type; });
-      renderShaders(filtered);
+      renderShaders(shaders.filter(s => s.type === type));
     }
   });
 }
@@ -1053,15 +1039,15 @@ function setupShaderFilters() {
 // ===== Snippet Search & Filters =====
 
 function setupSnippetSearch() {
-  var input = document.getElementById("snippetSearch");
+  const input = document.getElementById("snippetSearch");
   if (!input) return;
-  input.addEventListener("input", function() {
-    var query = input.value.toLowerCase();
-    var activeEngine = document.querySelector(".snippet-filters .tag-btn.active");
-    var engine = activeEngine ? activeEngine.dataset.snippetEngine : "All";
-    var filtered = snippets.filter(function(s) {
-      var matchesSearch = s.title.toLowerCase().includes(query) || (s.description || "").toLowerCase().includes(query) || (s.category || "").toLowerCase().includes(query);
-      var matchesEngine = engine === "All" || s.engine === engine;
+  input.addEventListener("input", () => {
+    const query = input.value.toLowerCase();
+    const activeEngine = document.querySelector(".snippet-filters .tag-btn.active");
+    const engine = activeEngine ? activeEngine.dataset.snippetEngine : "All";
+    const filtered = snippets.filter(s => {
+      const matchesSearch = s.title.toLowerCase().includes(query) || (s.description || "").toLowerCase().includes(query) || (s.category || "").toLowerCase().includes(query);
+      const matchesEngine = engine === "All" || s.engine === engine;
       return matchesSearch && matchesEngine;
     });
     renderSnippets(filtered);
@@ -1069,17 +1055,17 @@ function setupSnippetSearch() {
 }
 
 function setupSnippetFilters() {
-  var container = document.getElementById("snippetFilters");
+  const container = document.getElementById("snippetFilters");
   if (!container) return;
-  container.addEventListener("click", function(e) {
+  container.addEventListener("click", (e) => {
     if (!e.target.classList.contains("tag-btn")) return;
-    container.querySelectorAll(".tag-btn").forEach(function(b) { b.classList.remove("active"); });
+    container.querySelectorAll(".tag-btn").forEach(b => b.classList.remove("active"));
     e.target.classList.add("active");
-    var engine = e.target.dataset.snippetEngine;
-    var query = (document.getElementById("snippetSearch").value || "").toLowerCase();
-    var filtered = snippets.filter(function(s) {
-      var matchesEngine = engine === "All" || s.engine === engine;
-      var matchesSearch = s.title.toLowerCase().includes(query) || (s.description || "").toLowerCase().includes(query);
+    const engine = e.target.dataset.snippetEngine;
+    const query = (document.getElementById("snippetSearch").value || "").toLowerCase();
+    const filtered = snippets.filter(s => {
+      const matchesEngine = engine === "All" || s.engine === engine;
+      const matchesSearch = s.title.toLowerCase().includes(query) || (s.description || "").toLowerCase().includes(query);
       return matchesEngine && matchesSearch;
     });
     renderSnippets(filtered);
@@ -1087,12 +1073,6 @@ function setupSnippetFilters() {
 }
 
 // ===== Modal & Toast System =====
-
-function escapeHTML(str) {
-  var div = document.createElement("div");
-  div.appendChild(document.createTextNode(str));
-  return div.innerHTML;
-}
 
 function showToast(message, type) {
   type = type || "success";
@@ -1258,7 +1238,7 @@ function assetFormHTML(a) {
     '<div class="form-row">' +
       '<div class="form-group">' +
         '<label class="form-label">Type</label>' +
-        '<select class="form-select" id="f-type">' + selectOptions(["3D Models", "Textures", "Audio", "Animations", "UI Elements"], a.type || "3D Models") + '</select>' +
+        '<select class="form-select" id="f-type">' + selectOptions(assetTypes.filter(function(t) { return t !== "All"; }), a.type || "3D Models") + '</select>' +
       '</div>' +
       '<div class="form-group">' +
         '<label class="form-label">Size</label>' +
@@ -1970,71 +1950,8 @@ function deletePerfMetric(id) {
 }
 
 // Data Management
-function exportAllData() {
-  var data = DataService.exportData();
-  var dataStr = JSON.stringify(data, null, 2);
-  var dataBlob = new Blob([dataStr], { type: 'application/json' });
-  var url = URL.createObjectURL(dataBlob);
-  var link = document.createElement('a');
-  link.href = url;
-  link.download = 'dtcc-data-' + new Date().toISOString().split('T')[0] + '.json';
-  link.click();
-  URL.revokeObjectURL(url);
-  showToast("Data exported successfully!");
-}
 
-function importData() {
-  var input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json';
-  input.onchange = function(e) {
-    var file = e.target.files[0];
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function(event) {
-      try {
-        var data = JSON.parse(event.target.result);
-        DataService.importData(data);
-        renderProjects();
-        renderAssets();
-        renderBuilds();
-        renderTeam();
-        renderEvents();
-        renderKPIs();
-        renderScenes();
-        renderShaders();
-        renderSnippets();
-        renderPerfMetrics();
-        showToast("Data imported successfully!");
-      } catch (err) {
-        showToast("Error importing data: " + err.message, "error");
-      }
-    };
-    reader.readAsText(file);
-  };
-  input.click();
-}
-
-function resetData() {
-  confirmModal("Are you sure you want to reset all data to defaults? This cannot be undone.", function() {
-    DataService.resetToDefaults();
-    renderProjects();
-    renderAssets();
-    renderBuilds();
-    renderTeam();
-    renderEvents();
-    renderKPIs();
-    renderScenes();
-    renderShaders();
-    renderSnippets();
-    renderPerfMetrics();
-    showToast("Data reset to defaults successfully!");
-  });
-}
-
-// ===== Init =====
-
-document.addEventListener("DOMContentLoaded", () => {
+function renderAll() {
   renderProjects();
   renderTagFilters();
   renderAssets();
@@ -2046,6 +1963,56 @@ document.addEventListener("DOMContentLoaded", () => {
   renderShaders();
   renderSnippets();
   renderPerfMetrics();
+}
+
+function exportAllData() {
+  const data = DataService.exportData();
+  const dataStr = JSON.stringify(data, null, 2);
+  const dataBlob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(dataBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'gameforge-data-' + new Date().toISOString().split('T')[0] + '.json';
+  link.click();
+  URL.revokeObjectURL(url);
+  showToast("Data exported successfully!");
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        DataService.importData(data);
+        renderAll();
+        showToast("Data imported successfully!");
+      } catch (err) {
+        showToast("Error importing data: " + err.message, "error");
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function resetData() {
+  confirmModal("Are you sure you want to reset all data to defaults? This cannot be undone.", () => {
+    DataService.resetToDefaults();
+    renderAll();
+    showToast("Data reset to defaults successfully!");
+  });
+}
+
+// ===== Init =====
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderAll();
   setupAssetSearch();
   setupTagFilters();
   setupSidebar();
