@@ -83,7 +83,8 @@ export default function Events() {
     setDragOverId(index);
   };
 
-  const handleDragLeave = () => {
+  const handleDragLeave = (e) => {
+    if (e.currentTarget.contains(e.relatedTarget)) return;
     setDragOverId(null);
   };
 
