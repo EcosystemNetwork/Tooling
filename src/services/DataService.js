@@ -289,71 +289,69 @@ const DataService = {
   // Default data sets
   getDefaultProjects() {
     return [
-      { id: 1, name: "Nebula Frontier", status: "Active", teamSize: 24, lastUpdated: "2026-02-10", completion: 78, description: "Open-world space exploration game with procedural generation and multiplayer combat.", repoUrl: "https://github.com/studio/nebula-frontier" },
-      { id: 2, name: "Shadowkeep Arena", status: "Beta", teamSize: 18, lastUpdated: "2026-02-08", completion: 92, description: "Competitive PvP arena shooter with ranked matchmaking and seasonal content.", repoUrl: "https://github.com/studio/shadowkeep-arena" },
-      { id: 3, name: "Pixel Odyssey", status: "Alpha", teamSize: 12, lastUpdated: "2026-02-06", completion: 45, description: "Retro-inspired platformer with roguelike elements and pixel art graphics.", repoUrl: "https://github.com/studio/pixel-odyssey" },
-      { id: 4, name: "Titan Forge", status: "Maintenance", teamSize: 8, lastUpdated: "2025-12-20", completion: 100, description: "Crafting and building simulation game in maintenance mode.", repoUrl: "" },
-      { id: 5, name: "Void Runners", status: "Active", teamSize: 20, lastUpdated: "2026-02-09", completion: 62, description: "Fast-paced racing game set in zero-gravity environments.", repoUrl: "https://github.com/studio/void-runners" },
+      { id: 1, name: "GameForge Studio", status: "Active", teamSize: 5, lastUpdated: "2026-02-15", completion: 85, description: "Browser-based game development tooling platform built with React, Three.js, and Babylon.js.", repoUrl: "https://github.com/EcosystemNetwork/Tooling" },
+      { id: 2, name: "Three.js Scene Viewer", status: "Active", teamSize: 3, lastUpdated: "2026-02-14", completion: 100, description: "Interactive 3D scene playground with multiple geometries, orbit controls, and screenshot capture.", repoUrl: "https://github.com/EcosystemNetwork/Tooling" },
+      { id: 3, name: "GLSL Shader Lab", status: "Active", teamSize: 2, lastUpdated: "2026-02-13", completion: 100, description: "Live GLSL shader editor with vertex and fragment shader support, presets, and real-time preview.", repoUrl: "https://github.com/EcosystemNetwork/Tooling" },
+      { id: 4, name: "Asset Pipeline", status: "Beta", teamSize: 3, lastUpdated: "2026-02-12", completion: 72, description: "Upload, organize, and preview game assets including 3D models, textures, audio, and animations.", repoUrl: "https://github.com/EcosystemNetwork/Tooling" },
+      { id: 5, name: "Performance Monitor", status: "Active", teamSize: 2, lastUpdated: "2026-02-11", completion: 90, description: "Real-time FPS tracking, memory usage monitoring, and WebGL capabilities detection.", repoUrl: "https://github.com/EcosystemNetwork/Tooling" },
     ];
   },
 
   getDefaultAssets() {
     return [
-      { id: 1, name: "Spaceship Hull", type: "3D Models", size: "14.2 MB", author: "J. Park", color: "#1e88e5" },
-      { id: 2, name: "Lava Texture Pack", type: "Textures", size: "8.7 MB", author: "S. Chen", color: "#ff5252" },
-      { id: 3, name: "Laser SFX Bundle", type: "Audio", size: "3.1 MB", author: "M. Rivera", color: "#00c9a7" },
-      { id: 4, name: "Character Run Cycle", type: "Animations", size: "6.4 MB", author: "A. Kowalski", color: "#ffab40" },
-      { id: 5, name: "HUD Crosshair Set", type: "UI Elements", size: "1.2 MB", author: "L. Nguyen", color: "#42a5f5" },
-      { id: 6, name: "Forest Ambience", type: "Audio", size: "5.8 MB", author: "D. Okafor", color: "#00e676" },
-      { id: 7, name: "Stone Wall Tileset", type: "Textures", size: "11.3 MB", author: "R. Müller", color: "#8d6e63" },
-      { id: 8, name: "Dragon Rig", type: "3D Models", size: "22.6 MB", author: "K. Tanaka", color: "#7c4dff" },
+      { id: 1, name: "Default Cube", type: "3D Models", size: "0.2 MB", author: "Three.js", color: "#1e88e5" },
+      { id: 2, name: "Grid Texture", type: "Textures", size: "0.5 MB", author: "GameForge", color: "#ff5252" },
+      { id: 3, name: "UI Click Sound", type: "Audio", size: "0.1 MB", author: "GameForge", color: "#00c9a7" },
+      { id: 4, name: "Orbit Camera Rig", type: "Animations", size: "0.3 MB", author: "Three.js", color: "#ffab40" },
+      { id: 5, name: "Button Icon Set", type: "UI Elements", size: "0.8 MB", author: "GameForge", color: "#42a5f5" },
+      { id: 6, name: "Ambient Loop", type: "Audio", size: "2.4 MB", author: "GameForge", color: "#00e676" },
+      { id: 7, name: "PBR Material Pack", type: "Textures", size: "4.6 MB", author: "Poly Haven", color: "#8d6e63" },
+      { id: 8, name: "Character Base Mesh", type: "3D Models", size: "8.1 MB", author: "Sketchfab", color: "#7c4dff" },
     ];
   },
 
   getDefaultBuilds() {
     return [
-      { id: 1, project: "Nebula Frontier", branch: "main", status: "Success", duration: "4m 32s", triggeredBy: "J. Park", timestamp: "2026-02-10 14:23" },
-      { id: 2, project: "Shadowkeep Arena", branch: "release/0.9", status: "Success", duration: "6m 11s", triggeredBy: "CI Bot", timestamp: "2026-02-10 12:05" },
-      { id: 3, project: "Pixel Odyssey", branch: "feature/inventory", status: "Failed", duration: "2m 48s", triggeredBy: "A. Kowalski", timestamp: "2026-02-10 10:17" },
-      { id: 4, project: "Titan Forge", branch: "hotfix/crash", status: "Success", duration: "3m 05s", triggeredBy: "L. Nguyen", timestamp: "2026-02-09 22:44" },
-      { id: 5, project: "Nebula Frontier", branch: "feature/multiplayer", status: "In Progress", duration: "1m 22s", triggeredBy: "S. Chen", timestamp: "2026-02-10 14:50" },
-      { id: 6, project: "Void Runners", branch: "develop", status: "Failed", duration: "5m 09s", triggeredBy: "M. Rivera", timestamp: "2026-02-10 09:30" },
-      { id: 7, project: "Shadowkeep Arena", branch: "main", status: "Success", duration: "5m 55s", triggeredBy: "D. Okafor", timestamp: "2026-02-09 18:12" },
+      { id: 1, project: "GameForge Studio", branch: "main", status: "Success", duration: "2m 35s", triggeredBy: "CI Bot", timestamp: "2026-02-15 10:00" },
+      { id: 2, project: "GameForge Studio", branch: "feature/shader-lab", status: "Success", duration: "2m 18s", triggeredBy: "CI Bot", timestamp: "2026-02-14 16:30" },
+      { id: 3, project: "GameForge Studio", branch: "feature/scene-viewer", status: "Success", duration: "2m 42s", triggeredBy: "CI Bot", timestamp: "2026-02-13 11:15" },
+      { id: 4, project: "GameForge Studio", branch: "feature/performance", status: "Success", duration: "2m 10s", triggeredBy: "CI Bot", timestamp: "2026-02-12 09:45" },
+      { id: 5, project: "Asset Pipeline", branch: "main", status: "Success", duration: "1m 55s", triggeredBy: "CI Bot", timestamp: "2026-02-11 14:20" },
+      { id: 6, project: "GameForge Studio", branch: "feature/calendar", status: "Success", duration: "2m 28s", triggeredBy: "CI Bot", timestamp: "2026-02-10 13:00" },
+      { id: 7, project: "GameForge Studio", branch: "develop", status: "Success", duration: "2m 50s", triggeredBy: "CI Bot", timestamp: "2026-02-09 17:30" },
     ];
   },
 
   getDefaultTeamMembers() {
     return [
-      { id: 1, name: "Jordan Park", email: "j.park@studio.io", role: "Admin", status: "Active", lastLogin: "2026-02-10 14:00", color: "#1e88e5" },
-      { id: 2, name: "Sofia Chen", email: "s.chen@studio.io", role: "Developer", status: "Active", lastLogin: "2026-02-10 13:45", color: "#00c9a7" },
-      { id: 3, name: "Adam Kowalski", email: "a.kowalski@studio.io", role: "Artist", status: "Active", lastLogin: "2026-02-10 11:20", color: "#ffab40" },
-      { id: 4, name: "Mei Rivera", email: "m.rivera@studio.io", role: "QA", status: "Active", lastLogin: "2026-02-09 17:30", color: "#ff5252" },
-      { id: 5, name: "Linh Nguyen", email: "l.nguyen@studio.io", role: "Developer", status: "Inactive", lastLogin: "2025-12-28 09:15", color: "#7c4dff" },
-      { id: 6, name: "David Okafor", email: "d.okafor@studio.io", role: "Viewer", status: "Active", lastLogin: "2026-02-10 08:00", color: "#42a5f5" },
-      { id: 7, name: "Kira Tanaka", email: "k.tanaka@studio.io", role: "Artist", status: "Active", lastLogin: "2026-02-10 12:10", color: "#00e676" },
+      { id: 1, name: "Project Lead", email: "lead@gameforge.dev", role: "Admin", status: "Active", lastLogin: "2026-02-15 10:00", color: "#1e88e5" },
+      { id: 2, name: "Frontend Developer", email: "frontend@gameforge.dev", role: "Developer", status: "Active", lastLogin: "2026-02-15 09:30", color: "#00c9a7" },
+      { id: 3, name: "3D Artist", email: "artist@gameforge.dev", role: "Artist", status: "Active", lastLogin: "2026-02-14 16:00", color: "#ffab40" },
+      { id: 4, name: "QA Engineer", email: "qa@gameforge.dev", role: "QA", status: "Active", lastLogin: "2026-02-14 14:45", color: "#ff5252" },
+      { id: 5, name: "Backend Developer", email: "backend@gameforge.dev", role: "Developer", status: "Active", lastLogin: "2026-02-13 11:20", color: "#7c4dff" },
     ];
   },
 
   getDefaultEvents() {
     return [
-      { id: 1, name: "Winter Clash 2026", game: "Shadowkeep Arena", start: "2026-02-15", end: "2026-03-15", status: "Upcoming", type: "Seasonal" },
-      { id: 2, name: "Nebula Open Beta", game: "Nebula Frontier", start: "2026-02-20", end: "2026-03-03", status: "Upcoming", type: "Update" },
-      { id: 3, name: "Pixel World Cup", game: "Pixel Odyssey", start: "2026-02-05", end: "2026-02-12", status: "Live", type: "Tournament" },
-      { id: 4, name: "Forge Stability Patch", game: "Titan Forge", start: "2025-12-20", end: "2025-12-20", status: "Ended", type: "Hotfix" },
-      { id: 5, name: "Void Speed Trials", game: "Void Runners", start: "2026-03-01", end: "2026-03-14", status: "Upcoming", type: "Tournament" },
-      { id: 6, name: "Shadow Halloween Event", game: "Shadowkeep Arena", start: "2025-10-20", end: "2025-11-05", status: "Ended", type: "Seasonal" },
-      { id: 7, name: "Nebula v1.2 Rollout", game: "Nebula Frontier", start: "2026-02-10", end: "2026-02-10", status: "Live", type: "Update" },
+      { id: 1, name: "GameForge v1.0 Launch", game: "GameForge Studio", start: "2026-03-01", end: "2026-03-01", status: "Upcoming", type: "Update" },
+      { id: 2, name: "Shader Lab Beta Release", game: "GLSL Shader Lab", start: "2026-02-15", end: "2026-02-28", status: "Live", type: "Update" },
+      { id: 3, name: "Asset Pipeline Integration", game: "Asset Pipeline", start: "2026-02-20", end: "2026-03-10", status: "Upcoming", type: "Update" },
+      { id: 4, name: "Three.js v170 Migration", game: "Three.js Scene Viewer", start: "2026-02-01", end: "2026-02-14", status: "Ended", type: "Hotfix" },
+      { id: 5, name: "Performance Dashboard Sprint", game: "Performance Monitor", start: "2026-02-10", end: "2026-02-24", status: "Live", type: "Update" },
+      { id: 6, name: "WebGPU Support Preview", game: "GameForge Studio", start: "2026-04-01", end: "2026-04-30", status: "Upcoming", type: "Seasonal" },
+      { id: 7, name: "Code Snippets Library Expansion", game: "GameForge Studio", start: "2026-02-05", end: "2026-02-12", status: "Ended", type: "Update" },
     ];
   },
 
   getDefaultKPIs() {
     return [
-      { id: 1, label: "Daily Active Users", value: "128,430", trend: "up", change: "+12.4%" },
-      { id: 2, label: "Revenue (MTD)", value: "$1.42M", trend: "up", change: "+8.1%" },
-      { id: 3, label: "Retention Rate (D7)", value: "41.2%", trend: "down", change: "-2.3%" },
-      { id: 4, label: "Avg Session Duration", value: "24m 18s", trend: "up", change: "+5.7%" },
-      { id: 5, label: "New Users (Today)", value: "9,812", trend: "up", change: "+18.6%" },
-      { id: 6, label: "Conversion Rate", value: "3.8%", trend: "down", change: "-0.4%" },
+      { id: 1, label: "Total Projects", value: "5", trend: "up", change: "+2" },
+      { id: 2, label: "Total Assets", value: "8", trend: "up", change: "+3" },
+      { id: 3, label: "Build Success Rate", value: "100%", trend: "up", change: "+0%" },
+      { id: 4, label: "Active Team Members", value: "5", trend: "up", change: "+1" },
+      { id: 5, label: "Shader Presets", value: "6", trend: "up", change: "+2" },
+      { id: 6, label: "Code Snippets", value: "8", trend: "up", change: "+3" },
     ];
   }
 };
