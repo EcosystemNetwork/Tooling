@@ -63,36 +63,8 @@ export default function Assets() {
 
   // Load thumbnails on mount
   useEffect(() => {
-    const loadInitialThumbnails = async () => {
-      // Cleanup old thumbnail URLs
-      Object.values(thumbnailsRef.current).forEach(url => URL.revokeObjectURL(url));
-      
-      const allAssets = DataService.getAssets();
-      const thumbnailMap = {};
-      
-      for (const asset of allAssets) {
-        if (asset.hasFile) {
-          try {
-            const fileData = await FileStorageService.getFile(asset.id);
-            if (fileData && fileData.thumbnail) {
-              const url = URL.createObjectURL(fileData.thumbnail);
-              thumbnailMap[asset.id] = url;
-            } else if (fileData && fileData.file && fileData.fileType.startsWith('image/')) {
-              // If no thumbnail but it's an image, use the image itself
-              const url = URL.createObjectURL(fileData.file);
-              thumbnailMap[asset.id] = url;
-            }
-          } catch (err) {
-            console.error(`Failed to load thumbnail for asset ${asset.id}:`, err);
-          }
-        }
-      }
-      
-      thumbnailsRef.current = thumbnailMap;
-      setAssetThumbnails(thumbnailMap);
-    };
-    
-    loadInitialThumbnails();
+    loadThumbnails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Cleanup thumbnail URLs on unmount
