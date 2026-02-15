@@ -1,10 +1,25 @@
 import { useEffect, useRef } from 'react';
+import { animate } from 'animejs/animation';
 
 export default function Modal({ open, title, onClose, onConfirm, confirmLabel = 'Save', confirmClass = 'modal-btn-confirm', children }) {
   const firstInputRef = useRef(null);
 
   useEffect(() => {
     if (open) {
+      // Animate modal entrance
+      animate('.modal', {
+        scale: [0.7, 1],
+        opacity: [0, 1],
+        duration: 400,
+        ease: 'out(expo)',
+      });
+
+      animate('.modal-overlay', {
+        opacity: [0, 1],
+        duration: 300,
+        ease: 'out(cubic)',
+      });
+
       setTimeout(() => {
         const el = document.querySelector('.modal-body input, .modal-body select, .modal-body textarea');
         if (el) el.focus();

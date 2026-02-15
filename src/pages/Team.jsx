@@ -1,7 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import DataService from '../services/DataService';
 import Modal from '../components/Modal';
 import { useToast } from '../components/Toast';
+import { animate } from 'animejs/animation';
+import { stagger } from 'animejs/utils';
 
 function getInitials(name) {
   return name.split(' ').map(w => w[0]).join('').toUpperCase();
@@ -21,6 +23,18 @@ export default function Team() {
   const showToast = useToast();
 
   const refresh = () => setMembers(DataService.getTeamMembers());
+
+  // Animate team cards when members change
+  useEffect(() => {
+    animate('.team-card', {
+      scale: [0.9, 1],
+      opacity: [0, 1],
+      rotateY: [-15, 0],
+      delay: stagger(100),
+      duration: 800,
+      ease: 'out(expo)',
+    });
+  }, [members]);
 
   const openAdd = () => {
     setEditingId(null);

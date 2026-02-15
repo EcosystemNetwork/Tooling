@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import DataService from '../services/DataService';
 import { useToast } from './Toast';
+import { animate } from 'animejs/animation';
+import { stagger } from 'animejs/utils';
 
 const navItems = [
   { to: '/', icon: '📊', label: 'Dashboard' },
@@ -25,6 +27,69 @@ export default function Layout() {
 
   const toggleSidebar = () => setSidebarOpen(prev => !prev);
   const closeSidebar = () => setSidebarOpen(false);
+
+  // Initial animations on mount
+  useEffect(() => {
+    // Animate background shapes with floating effect
+    animate('.shape', {
+      translateX: function() {
+        return Math.random() * 100 - 50;
+      },
+      translateY: function() {
+        return Math.random() * 100 - 50;
+      },
+      scale: function() {
+        return Math.random() * 0.4 + 0.8;
+      },
+      duration: 8000,
+      ease: 'inOut(sine)',
+      direction: 'alternate',
+      loop: true,
+    });
+
+    // Animate header title
+    animate('.header-title', {
+      translateY: [-20, 0],
+      opacity: [0, 1],
+      duration: 1000,
+      ease: 'out(expo)',
+    });
+
+    // Animate header buttons
+    animate('.header-btn', {
+      translateY: [-20, 0],
+      opacity: [0, 1],
+      delay: stagger(100, {from: 'first', start: 300}),
+      duration: 800,
+      ease: 'out(expo)',
+    });
+
+    // Animate header avatar
+    animate('.header-avatar', {
+      scale: [0, 1],
+      rotate: [180, 0],
+      duration: 1000,
+      delay: 500,
+      ease: 'outElastic(1, 0.6)',
+    });
+
+    // Animate sidebar navigation items
+    animate('.nav-link', {
+      translateX: [-50, 0],
+      opacity: [0, 1],
+      delay: stagger(50, {from: 'first', start: 200}),
+      duration: 800,
+      ease: 'out(expo)',
+    });
+
+    // Animate sidebar logo
+    animate('.sidebar-logo', {
+      scale: [0, 1],
+      rotate: [-180, 0],
+      duration: 1200,
+      ease: 'outElastic(1, 0.5)',
+    });
+  }, []);
 
   const exportAllData = () => {
     const data = DataService.exportData();

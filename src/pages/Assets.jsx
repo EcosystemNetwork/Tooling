@@ -3,6 +3,8 @@ import DataService from '../services/DataService';
 import FileStorageService, { FileStorageService as FileStorageClass } from '../services/FileStorageService';
 import Modal from '../components/Modal';
 import { useToast } from '../components/Toast';
+import { animate } from 'animejs/animation';
+import { stagger } from 'animejs/utils';
 
 const assetTypes = ['All', '3D Models', 'Textures', 'Audio', 'Animations', 'UI Elements'];
 
@@ -81,6 +83,18 @@ export default function Assets() {
       return matchesSearch && matchesType;
     });
   }, [assets, search, activeType]);
+
+  // Animate asset cards when filtered list changes
+  useEffect(() => {
+    animate('.asset-card', {
+      scale: [0.8, 1],
+      opacity: [0, 1],
+      translateY: [30, 0],
+      delay: stagger(80),
+      duration: 600,
+      ease: 'out(expo)',
+    });
+  }, [filtered]);
 
   const openAdd = () => {
     setEditingId(null);

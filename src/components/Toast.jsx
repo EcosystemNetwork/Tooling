@@ -1,4 +1,5 @@
-import { useState, useCallback, createContext, useContext } from 'react';
+import { useState, useCallback, createContext, useContext, useEffect } from 'react';
+import { animate } from 'animejs/animation';
 
 const ToastContext = createContext();
 
@@ -22,6 +23,22 @@ export function ToastProvider({ children }) {
       }, 300);
     }, 3000);
   }, []);
+
+  // Animate toasts when they appear
+  useEffect(() => {
+    if (toasts.length > 0) {
+      const latestToast = document.querySelector('.toast:last-child');
+      if (latestToast && !latestToast.dataset.animated) {
+        latestToast.dataset.animated = 'true';
+        animate(latestToast, {
+          translateX: [100, 0],
+          opacity: [0, 1],
+          duration: 500,
+          ease: 'out(expo)',
+        });
+      }
+    }
+  }, [toasts]);
 
   const icons = { success: '✅', error: '❌', info: 'ℹ️' };
 

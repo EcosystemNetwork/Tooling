@@ -1,7 +1,9 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import DataService from '../services/DataService';
 import Modal from '../components/Modal';
 import { useToast } from '../components/Toast';
+import { animate } from 'animejs/animation';
+import { stagger } from 'animejs/utils';
 
 function statusBadgeClass(status) {
   const map = { Active: 'badge-active', Beta: 'badge-beta', Alpha: 'badge-alpha', Maintenance: 'badge-maintenance' };
@@ -25,6 +27,18 @@ export default function Dashboard() {
   const showToast = useToast();
 
   const refresh = () => setProjects(DataService.getProjects());
+
+  // Animate cards when projects change
+  useEffect(() => {
+    animate('.project-card', {
+      scale: [0.8, 1],
+      opacity: [0, 1],
+      translateY: [50, 0],
+      delay: stagger(100),
+      duration: 800,
+      ease: 'out(expo)',
+    });
+  }, [projects]);
 
   const openAdd = () => {
     setEditingId(null);

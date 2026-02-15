@@ -12,6 +12,7 @@
   "dependencies": {
     "@babylonjs/core": "^8.51.2",
     "@babylonjs/loaders": "^8.51.2",
+    "animejs": "^4.3.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.0",
