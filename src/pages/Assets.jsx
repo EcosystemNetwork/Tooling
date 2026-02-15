@@ -16,8 +16,10 @@ export default function Assets() {
   const [editingId, setEditingId] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [previewAsset, setPreviewAsset] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [form, setForm] = useState({});
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [thumbnailBlob, setThumbnailBlob] = useState(null);
   const [thumbnailUrl, setThumbnailUrl] = useState(null);
   const fileInputRef = useRef(null);
   const showToast = useToast();
@@ -36,7 +38,11 @@ export default function Assets() {
     setEditingId(null);
     setForm({ name: '', type: '3D Models', size: '1.0 MB', author: '', color: '#1e88e5' });
     setUploadedFile(null);
-    setThumbnailUrl(null);
+    setThumbnailBlob(null);
+    if (thumbnailUrl) {
+      URL.revokeObjectURL(thumbnailUrl);
+      setThumbnailUrl(null);
+    }
     setModalOpen(true);
   };
 
@@ -58,6 +64,7 @@ export default function Assets() {
         try {
           const thumbnail = await FileStorageService.generateThumbnail(file);
           if (thumbnail) {
+            setThumbnailBlob(thumbnail);
             const url = URL.createObjectURL(thumbnail);
             setThumbnailUrl(url);
           }
@@ -101,12 +108,13 @@ export default function Assets() {
       // Store file in IndexedDB if uploaded
       if (uploadedFile && assetId) {
         await FileStorageService.storeFile(assetId, uploadedFile, {
-          thumbnail: thumbnailUrl ? await fetch(thumbnailUrl).then(r => r.blob()) : null
+          thumbnail: thumbnailBlob
         });
       }
 
       setModalOpen(false);
       setUploadedFile(null);
+      setThumbnailBlob(null);
       if (thumbnailUrl) {
         URL.revokeObjectURL(thumbnailUrl);
         setThumbnailUrl(null);
@@ -115,7 +123,7 @@ export default function Assets() {
     } catch (err) {
       showToast('Failed to save asset: ' + err.message, 'error');
     }
-  }, [form, editingId, uploadedFile, thumbnailUrl, showToast]);
+  }, [form, editingId, uploadedFile, thumbnailBlob, thumbnailUrl, showToast]);
 
   const handleDelete = (id) => { setDeleteId(id); setConfirmOpen(true); };
 
@@ -137,6 +145,8 @@ export default function Assets() {
     try {
       const fileData = await FileStorageService.getFile(asset.id);
       if (fileData) {
+        const url = URL.createObjectURL(fileData.file);
+        setPreviewUrl(url);
         setPreviewAsset({ ...asset, fileData });
         setPreviewOpen(true);
       } else {
@@ -145,6 +155,15 @@ export default function Assets() {
     } catch (err) {
       showToast('Failed to load file: ' + err.message, 'error');
     }
+  };
+
+  const closePreview = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
+    setPreviewOpen(false);
+    setPreviewAsset(null);
   };
 
   const handleDownload = async (asset) => {
@@ -188,7 +207,7 @@ export default function Assets() {
         {filtered.map((a, i) => (
           <div key={a.id} className="card asset-card reveal-item" style={{ animationDelay: `${i * 0.07}s` }}>
             <div className="asset-thumb" style={{ background: `linear-gradient(135deg, ${a.color}, ${a.color}88)` }}>
-              {a.hasFile && <div style={{ position: 'absolute', top: '8px', right: '8px', background: '#00c9a7', color: '#fff', padding: '4px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 'bold' }}>📎 FILE</div>}
+              {a.hasFile && <div className="asset-file-badge">📎 FILE</div>}
             </div>
             <div className="asset-name">{a.name}</div>
             <div className="asset-info">
@@ -251,7 +270,15 @@ export default function Assets() {
           </div>
           <div className="form-group">
             <label className="form-label">Size</label>
-            <input className="form-input" type="text" value={form.size || ''} onChange={e => setForm(f => ({ ...f, size: e.target.value }))} placeholder="e.g., 10.5 MB" disabled={uploadedFile} />
+            <input 
+              className="form-input" 
+              type="text" 
+              value={form.size || ''} 
+              onChange={e => setForm(f => ({ ...f, size: e.target.value }))} 
+              placeholder="e.g., 10.5 MB" 
+              disabled={uploadedFile}
+              title={uploadedFile ? 'Size is automatically calculated from uploaded file' : ''}
+            />
           </div>
         </div>
         <div className="form-row">
@@ -270,12 +297,12 @@ export default function Assets() {
         <p className="confirm-message">Are you sure you want to delete this asset?</p>
       </Modal>
 
-      <Modal open={previewOpen} title={`Preview: ${previewAsset?.name || ''}`} onClose={() => setPreviewOpen(false)} onConfirm={() => setPreviewOpen(false)} confirmLabel="Close">
-        {previewAsset?.fileData && (
+      <Modal open={previewOpen} title={`Preview: ${previewAsset?.name || ''}`} onClose={closePreview} onConfirm={closePreview} confirmLabel="Close">
+        {previewAsset?.fileData && previewUrl && (
           <div style={{ padding: '10px' }}>
             {previewAsset.fileData.fileType.startsWith('image/') && (
               <img 
-                src={URL.createObjectURL(previewAsset.fileData.file)} 
+                src={previewUrl} 
                 alt={previewAsset.name}
                 style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px' }}
               />
@@ -283,14 +310,14 @@ export default function Assets() {
             {previewAsset.fileData.fileType.startsWith('audio/') && (
               <div>
                 <audio controls style={{ width: '100%', marginTop: '10px' }}>
-                  <source src={URL.createObjectURL(previewAsset.fileData.file)} type={previewAsset.fileData.fileType} />
+                  <source src={previewUrl} type={previewAsset.fileData.fileType} />
                   Your browser does not support the audio element.
                 </audio>
               </div>
             )}
             {previewAsset.fileData.fileType.startsWith('video/') && (
               <video controls style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px' }}>
-                <source src={URL.createObjectURL(previewAsset.fileData.file)} type={previewAsset.fileData.fileType} />
+                <source src={previewUrl} type={previewAsset.fileData.fileType} />
                 Your browser does not support the video element.
               </video>
             )}
