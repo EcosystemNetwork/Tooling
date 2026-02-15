@@ -176,6 +176,7 @@ class FileStorageService {
   }
 }
 
-// Export singleton instance
+// Export singleton instance and class for static methods
 const fileStorageService = new FileStorageService();
+export { FileStorageService };
 export default fileStorageService;

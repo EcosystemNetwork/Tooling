@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useRef } from 'react';
 import DataService from '../services/DataService';
-import FileStorageService from '../services/FileStorageService';
+import FileStorageService, { FileStorageService as FileStorageClass } from '../services/FileStorageService';
 import Modal from '../components/Modal';
 import { useToast } from '../components/Toast';
 
@@ -44,8 +44,8 @@ export default function Assets() {
     const file = e.target.files?.[0];
     if (file) {
       setUploadedFile(file);
-      const detectedType = FileStorageService.getAssetType(file.type);
-      const size = FileStorageService.formatFileSize(file.size);
+      const detectedType = FileStorageClass.getAssetType(file.type);
+      const size = FileStorageClass.formatFileSize(file.size);
       setForm(f => ({ 
         ...f, 
         name: f.name || file.name,
@@ -303,7 +303,7 @@ export default function Assets() {
                 <p style={{ color: '#6080a0', fontSize: '14px', marginTop: '10px' }}>
                   File: {previewAsset.fileData.fileName}<br/>
                   Type: {previewAsset.fileData.fileType}<br/>
-                  Size: {FileStorageService.formatFileSize(previewAsset.fileData.fileSize)}
+                  Size: {FileStorageClass.formatFileSize(previewAsset.fileData.fileSize)}
                 </p>
               </div>
             )}
