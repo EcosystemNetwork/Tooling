@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import DataService from '../services/DataService';
 import FileStorageService, { FileStorageService as FileStorageClass } from '../services/FileStorageService';
 import Modal from '../components/Modal';
@@ -21,10 +21,76 @@ export default function Assets() {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [thumbnailBlob, setThumbnailBlob] = useState(null);
   const [thumbnailUrl, setThumbnailUrl] = useState(null);
+  const [assetThumbnails, setAssetThumbnails] = useState({});
   const fileInputRef = useRef(null);
   const showToast = useToast();
 
-  const refresh = () => setAssets(DataService.getAssets());
+  const refresh = useCallback(() => {
+    const newAssets = DataService.getAssets();
+    setAssets(newAssets);
+  }, []);
+
+  // Load thumbnails for all assets with files
+  const loadThumbnails = useCallback(async () => {
+    const allAssets = DataService.getAssets();
+    const thumbnailMap = {};
+    
+    for (const asset of allAssets) {
+      if (asset.hasFile) {
+        try {
+          const fileData = await FileStorageService.getFile(asset.id);
+          if (fileData && fileData.thumbnail) {
+            const url = URL.createObjectURL(fileData.thumbnail);
+            thumbnailMap[asset.id] = url;
+          } else if (fileData && fileData.file && fileData.fileType.startsWith('image/')) {
+            // If no thumbnail but it's an image, use the image itself
+            const url = URL.createObjectURL(fileData.file);
+            thumbnailMap[asset.id] = url;
+          }
+        } catch (err) {
+          console.error(`Failed to load thumbnail for asset ${asset.id}:`, err);
+        }
+      }
+    }
+    
+    setAssetThumbnails(thumbnailMap);
+  }, []);
+
+  // Load thumbnails on mount
+  useEffect(() => {
+    const loadInitialThumbnails = async () => {
+      const allAssets = DataService.getAssets();
+      const thumbnailMap = {};
+      
+      for (const asset of allAssets) {
+        if (asset.hasFile) {
+          try {
+            const fileData = await FileStorageService.getFile(asset.id);
+            if (fileData && fileData.thumbnail) {
+              const url = URL.createObjectURL(fileData.thumbnail);
+              thumbnailMap[asset.id] = url;
+            } else if (fileData && fileData.file && fileData.fileType.startsWith('image/')) {
+              const url = URL.createObjectURL(fileData.file);
+              thumbnailMap[asset.id] = url;
+            }
+          } catch (err) {
+            console.error(`Failed to load thumbnail for asset ${asset.id}:`, err);
+          }
+        }
+      }
+      
+      setAssetThumbnails(thumbnailMap);
+    };
+    
+    loadInitialThumbnails();
+  }, []);
+
+  // Cleanup thumbnail URLs on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(assetThumbnails).forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [assetThumbnails]);
 
   const filtered = useMemo(() => {
     return assets.filter(a => {
@@ -120,10 +186,11 @@ export default function Assets() {
         setThumbnailUrl(null);
       }
       refresh();
+      await loadThumbnails();
     } catch (err) {
       showToast('Failed to save asset: ' + err.message, 'error');
     }
-  }, [form, editingId, uploadedFile, thumbnailBlob, thumbnailUrl, showToast]);
+  }, [form, editingId, uploadedFile, thumbnailBlob, thumbnailUrl, showToast, loadThumbnails, refresh]);
 
   const handleDelete = (id) => { setDeleteId(id); setConfirmOpen(true); };
 
@@ -138,8 +205,9 @@ export default function Assets() {
     DataService.deleteAsset(deleteId);
     setConfirmOpen(false);
     refresh();
+    await loadThumbnails();
     showToast('Asset deleted', 'info');
-  }, [deleteId, showToast]);
+  }, [deleteId, showToast, refresh, loadThumbnails]);
 
   const handlePreview = async (asset) => {
     try {
@@ -206,7 +274,12 @@ export default function Assets() {
       <div className="asset-grid">
         {filtered.map((a, i) => (
           <div key={a.id} className="card asset-card reveal-item" style={{ animationDelay: `${i * 0.07}s` }}>
-            <div className="asset-thumb" style={{ background: `linear-gradient(135deg, ${a.color}, ${a.color}88)` }}>
+            <div className="asset-thumb" style={{ 
+              background: assetThumbnails[a.id] 
+                ? `url(${assetThumbnails[a.id]}) center/cover` 
+                : `linear-gradient(135deg, ${a.color}, ${a.color}88)`,
+              position: 'relative'
+            }}>
               {a.hasFile && <div className="asset-file-badge">📎 FILE</div>}
             </div>
             <div className="asset-name">{a.name}</div>
