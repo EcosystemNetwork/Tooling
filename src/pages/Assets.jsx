@@ -23,6 +23,7 @@ export default function Assets() {
   const [thumbnailUrl, setThumbnailUrl] = useState(null);
   const [assetThumbnails, setAssetThumbnails] = useState({});
   const fileInputRef = useRef(null);
+  const thumbnailsRef = useRef({});
   const showToast = useToast();
 
   const refresh = useCallback(() => {
@@ -32,6 +33,9 @@ export default function Assets() {
 
   // Load thumbnails for all assets with files
   const loadThumbnails = useCallback(async () => {
+    // Cleanup old thumbnail URLs
+    Object.values(thumbnailsRef.current).forEach(url => URL.revokeObjectURL(url));
+    
     const allAssets = DataService.getAssets();
     const thumbnailMap = {};
     
@@ -53,12 +57,16 @@ export default function Assets() {
       }
     }
     
+    thumbnailsRef.current = thumbnailMap;
     setAssetThumbnails(thumbnailMap);
   }, []);
 
   // Load thumbnails on mount
   useEffect(() => {
     const loadInitialThumbnails = async () => {
+      // Cleanup old thumbnail URLs
+      Object.values(thumbnailsRef.current).forEach(url => URL.revokeObjectURL(url));
+      
       const allAssets = DataService.getAssets();
       const thumbnailMap = {};
       
@@ -70,6 +78,7 @@ export default function Assets() {
               const url = URL.createObjectURL(fileData.thumbnail);
               thumbnailMap[asset.id] = url;
             } else if (fileData && fileData.file && fileData.fileType.startsWith('image/')) {
+              // If no thumbnail but it's an image, use the image itself
               const url = URL.createObjectURL(fileData.file);
               thumbnailMap[asset.id] = url;
             }
@@ -79,6 +88,7 @@ export default function Assets() {
         }
       }
       
+      thumbnailsRef.current = thumbnailMap;
       setAssetThumbnails(thumbnailMap);
     };
     
@@ -88,9 +98,9 @@ export default function Assets() {
   // Cleanup thumbnail URLs on unmount
   useEffect(() => {
     return () => {
-      Object.values(assetThumbnails).forEach(url => URL.revokeObjectURL(url));
+      Object.values(thumbnailsRef.current).forEach(url => URL.revokeObjectURL(url));
     };
-  }, [assetThumbnails]);
+  }, []);
 
   const filtered = useMemo(() => {
     return assets.filter(a => {
