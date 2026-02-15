@@ -54,7 +54,7 @@ export default function Team() {
     const lastLogin = now.toISOString().split('T')[0] + ' ' + now.toTimeString().split(' ')[0].slice(0, 5);
     const data = {
       name: form.name.trim(),
-      email: form.email || 'user@studio.io',
+      email: form.email || 'user@gameforge.dev',
       role: form.role,
       status: form.status,
       color: form.color || '#1e88e5',

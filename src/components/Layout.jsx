@@ -158,8 +158,8 @@ export default function Layout() {
           <button className="header-btn" onClick={resetData} title="Reset Data">🔄 Reset</button>
         </div>
         <div className="header-user">
-          <span className="header-user-name">Alex M.</span>
-          <div className="header-avatar">AM</div>
+          <span className="header-user-name">User</span>
+          <div className="header-avatar">GF</div>
         </div>
       </header>
 
